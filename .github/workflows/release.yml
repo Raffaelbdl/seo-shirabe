@@ -1,22 +1,52 @@
-# Publishes v<package.json version> as a GitHub release from main:
-# Actions → Release → "Run workflow" on main. The tag is created by the release.
-# The release carries seo-shirabe-<version>-chrome.zip: unzip it and drag the
-# folder onto chrome://extensions (Developer mode on).
+# Publishes v<package.json version> as a GitHub release from main, with
+# seo-shirabe-<version>-chrome.zip (unzip it and drag the folder onto
+# chrome://extensions, Developer mode on). The tag is created by the release.
+#
+# Runs automatically when a push to main changes package.json, and publishes
+# only if that version has no release yet: bump "version" in package.json by
+# hand to release. Can also be started from Actions → Release → "Run workflow".
 name: Release
 
 on:
+  push:
+    branches: [main]
+    paths: [package.json]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  check:
+  version:
     if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+      exists: ${{ steps.tag.outputs.exists }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Is there already a release for this version?
+        id: tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v$(node -p "require('./package.json').version")"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if gh release view "$tag" > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::$tag is already released; bump version in package.json to publish a new one."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  check:
+    needs: version
+    if: needs.version.outputs.exists == 'false'
     uses: ./.github/workflows/ci.yml
 
   release:
-    needs: check
+    needs: [version, check]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -28,12 +58,11 @@ jobs:
           node-version: 22
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
-      - name: Resolve the tag from package.json
-        run: echo "TAG=v$(node -p "require('./package.json').version")" >> "$GITHUB_ENV"
       - run: pnpm zip
       - name: Publish the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.version.outputs.tag }}
         run: |
           # --target creates the tag on this main commit
           gh release create "$TAG" .output/seo-shirabe-*-chrome.zip \
