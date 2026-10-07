@@ -19,7 +19,15 @@ const VITALS_SCRIPT_ID = 'shirabe-vitals';
 export default defineBackground(() => {
   const extOrigin = new URL(chrome.runtime.getURL('/')).origin;
 
-  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => undefined);
+  // The toolbar click opens the panel ourselves (instead of openPanelOnActionClick)
+  // so the panel can be told to re-read the tab: the click grants activeTab,
+  // which is what reveals the tab URL before the site is granted.
+  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false }).catch(() => undefined);
+  chrome.action.onClicked.addListener((tab) => {
+    // open() must run synchronously inside the user gesture
+    chrome.sidePanel.open({ windowId: tab.windowId }).catch(() => undefined);
+    chrome.runtime.sendMessage({ type: 'shirabe/action-clicked', tabId: tab.id }).catch(() => undefined);
+  });
 
   // ---- redirect chains of our own requests (webRequest, observe only) ------
   const requests = new Map<string, { url: string; start: number; hops: RedirectHop[] }>();

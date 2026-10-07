@@ -39,7 +39,10 @@ dependency install scripts by default, and `test:e2e` calls pnpm. See
 [docs/supply-chain.md](docs/supply-chain.md).
 
 `chrome://extensions` → enable *Developer mode* → *Load unpacked* → pick
-`.output/chrome-mv3`. Click the toolbar icon to open the side panel.
+`.output/chrome-mv3`. Pin the extension, then click the **Shirabe toolbar
+icon on the page you want to inspect**: the click opens the side panel and
+gives it temporary access to that tab (Chrome hides tab addresses from
+extensions otherwise). Then press *Allow <site>* once per site.
 
 The first time you audit a site, Shirabe asks for access to that origin
 (`optional_host_permissions`). *Settings (⚙) → Grant access to all sites*
