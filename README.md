@@ -104,9 +104,15 @@ in your own browser.
   targeting `main`: typecheck, unit tests, build and the e2e tests in Chromium.
 - `.github/workflows/release.yml` publishes `v<package.json version>` as a
   GitHub release with `seo-shirabe-<version>-chrome.zip`, after the same checks.
-  Bump `version` in `package.json` (releases are never overwritten), merge to
-  `main`, then click *Actions → Release → Run workflow* on `main`; the release
-  creates the tag. Runs on any other branch are skipped.
+  It runs automatically when a push to `main` changes `package.json`, and
+  publishes only if that version has no release yet. It can also be started
+  from *Actions → Release → Run workflow* on `main`.
+
+**The version is never bumped automatically.** To release, bump `version` in
+`package.json` by hand (e.g. `0.1.0` → `0.1.1`, following semver) in the
+branch you merge to `main`. Merging without a bump publishes nothing, and an
+existing release is never overwritten. The version is also what
+`chrome://extensions` shows, so you can tell which build is installed.
 
 Actions are pinned by commit SHA.
 

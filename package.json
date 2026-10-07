@@ -1,7 +1,7 @@
 {
   "name": "seo-shirabe",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Shirabe (調べ) — SEO & share-preview inspector Chrome extension",
   "type": "module",
   "packageManager": "pnpm@10.28.0",
