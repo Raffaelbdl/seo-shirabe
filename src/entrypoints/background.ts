@@ -26,7 +26,8 @@ export default defineBackground(() => {
   const ours = (d: { tabId: number; initiator?: string }) => d.tabId === -1 && d.initiator === extOrigin;
   chrome.webRequest.onBeforeRequest.addListener(
     (d) => {
-      if (!ours(d)) return undefined;
+      // A redirect fires onBeforeRequest again with the same requestId: keep the first URL.
+      if (!ours(d) || requests.has(d.requestId)) return undefined;
       requests.set(d.requestId, { url: d.url, start: d.timeStamp, hops: [] });
       const cutoff = Date.now() - 120_000;
       for (const [id, r] of requests) if (r.start < cutoff) requests.delete(id);
@@ -166,7 +167,8 @@ export default defineBackground(() => {
 
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     // Only our own extension pages (side panel) may call the background.
-    if (sender.id !== chrome.runtime.id || sender.tab || !sender.url?.startsWith(extOrigin)) return false;
+    // (sender.url is the web page for content scripts, the extension origin for our pages.)
+    if (sender.id !== chrome.runtime.id || !sender.url?.startsWith(`${extOrigin}/`)) return false;
     if (msg && typeof msg === 'object' && (msg as { target?: string }).target === 'offscreen') return false;
     const req = validateBgRequest(msg);
     if (!req) {

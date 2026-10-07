@@ -116,7 +116,8 @@ export function isHomeLike(u: string): boolean {
   if (!p) return false;
   const segs = p.pathname.split('/').filter(Boolean);
   if (segs.length === 0) return true;
-  return segs.length === 1 && /^[a-z]{2,3}([-_][a-z0-9]{2,4})?$/i.test(segs[0]) && !p.search;
+  // two-letter language, optionally with region or script (fr, en-us, zh-hant); not /map or /faq
+  return segs.length === 1 && /^[a-z]{2}([-_]([a-z]{2}|[a-z]{4}|\d{3}))?$/i.test(segs[0]) && !p.search;
 }
 
 export function isHomepage(u: string): boolean {

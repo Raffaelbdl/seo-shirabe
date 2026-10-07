@@ -7,4 +7,4 @@ playwright-report/
 *.log
 .DS_Store
 # Real-site fixtures are fetched locally by scripts/fetch-fixtures.mjs.
-tests/fixtures/real/*.html
+tests/fixtures/real/

@@ -59,7 +59,9 @@ const mb = (n: number) => `${(n / 1024 / 1024).toFixed(1)} MB`;
 export function genericImageIssues(c: ShareImageCheck): ImageIssue[] {
   const out: ImageIssue[] = [];
   if (!c.https) out.push({ severity: 'warning', text: 'Image URL is not https' });
-  if (c.error) out.push({ severity: 'error', text: `Could not load the image: ${c.error}` });
+  if (c.error && /CORS|host access/i.test(c.error))
+    out.push({ severity: 'info', text: `Image not checked: Shirabe has no access to ${c.host ?? 'its host'} (grant it in the Share tab)` });
+  else if (c.error) out.push({ severity: 'error', text: `Could not load the image: ${c.error}` });
   else if (c.status !== 200) out.push({ severity: 'error', text: `Image returns HTTP ${c.status} without cookies` });
   else if (!/^image\//i.test(c.contentType ?? ''))
     out.push({ severity: 'error', text: `Content-Type is ${c.contentType ?? 'missing'}, not image/*` });

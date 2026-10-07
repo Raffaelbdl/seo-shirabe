@@ -12,6 +12,7 @@ const ISO639_1 = new Set(
 export function validateHreflang(code: string): string | null {
   const c = code.trim();
   if (c.toLowerCase() === 'x-default') return null;
+  if (c.includes('_')) return 'use "-" not "_" as separator';
   const parts = c.split('-');
   const lang = parts[0].toLowerCase();
   if (!ISO639_1.has(lang)) {
@@ -19,7 +20,6 @@ export function validateHreflang(code: string): string | null {
       return `"${lang}" is a country code, not a language code`;
     return `"${parts[0]}" is not an ISO 639-1 language code`;
   }
-  if (c.includes('_')) return 'use "-" not "_" as separator';
   for (const p of parts.slice(1)) {
     if (/^[a-z]{4}$/i.test(p)) continue; // script (zh-Hant)
     if (!/^[a-z]{2}$/i.test(p) && !/^\d{3}$/.test(p)) return `"${p}" is not an ISO 3166-1 region code`;

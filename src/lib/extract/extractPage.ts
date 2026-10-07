@@ -1,7 +1,7 @@
 import type { PageData, PageView } from '../types';
 
 export interface ExtractArgs {
-  /** Raw HTML to parse with DOMParser; null = use the live `document`. */
+  /** Raw HTML to parse with DOMParser; null (or absent) = use the live `document`. */
   html: string | null;
   url: string;
   view: PageView;
@@ -24,8 +24,10 @@ export function extractPage(args: ExtractArgs): PageData {
   const MAX_CLICKABLES = 300;
   const MAX_SCAN_ELEMENTS = 25_000;
 
-  const doc: Document = args.html !== null ? new DOMParser().parseFromString(args.html, 'text/html') : document;
-  const isRendered = args.html === null;
+  // typeof check, not `!== null`: chrome.scripting.executeScript drops null
+  // properties from args, so the rendered call arrives with html undefined.
+  const isRendered = typeof args.html !== 'string';
+  const doc: Document = isRendered ? document : new DOMParser().parseFromString(args.html as string, 'text/html');
   const pageUrl = args.url;
   const encoder = new TextEncoder();
   const byteLength = (s: string) => encoder.encode(s).length;

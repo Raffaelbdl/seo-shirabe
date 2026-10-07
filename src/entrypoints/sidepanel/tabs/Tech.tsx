@@ -7,8 +7,6 @@ import type { TabProps } from '../props';
 import { ExtLink, Findings, KV, Muted, Section, Spinner } from '../ui';
 
 function botDiff(a: RawAudit, b: RawAudit): { field: string; browser: string; bot: string }[] {
-  const pa = a.page;
-  const pb = b.page;
   const rows: [string, (r: RawAudit) => string][] = [
     ['status', (r) => String(r.fetch.error ?? r.fetch.status)],
     ['final URL', (r) => r.fetch.finalUrl],
@@ -22,9 +20,7 @@ function botDiff(a: RawAudit, b: RawAudit): { field: string; browser: string; bo
     ['words', (r) => String(r.page?.wordCount ?? 0)],
     ['links', (r) => String(r.page?.anchors.length ?? 0)],
   ];
-  const out = rows.map(([field, get]) => ({ field, browser: get(a), bot: get(b) }));
-  if (!pa || !pb) return out;
-  return out;
+  return rows.map(([field, get]) => ({ field, browser: get(a), bot: get(b) }));
 }
 
 const PROBES: { id: keyof Probes; label: string; detail: string }[] = [

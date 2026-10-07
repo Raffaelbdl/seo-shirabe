@@ -1,0 +1,99 @@
+# Shirabe (調べ) — SEO & share-preview inspector
+
+A personal Chrome extension (Manifest V3, side panel) that goes beyond
+META SEO inspector:
+
+- **Two views of every page, side by side**: the **raw HTML** the server sends
+  (fetched by the extension without cookies, no JavaScript, which is what Googlebot
+  sees first and all social scrapers see) and the **rendered DOM** of the tab.
+  Every finding says which view it used, and the *Raw vs rendered* tab shows what
+  only exists after JavaScript.
+- **Actionable findings**: severity, the exact value found, why it matters, how to
+  fix it, a docs link and *Show in page*.
+- **Share previews** for X, Facebook, LinkedIn, Telegram, Discord, WhatsApp, Slack,
+  iMessage and Google (desktop/mobile), built from platform rule files with
+  their sources and verification date, plus share-image checks and crop previews.
+- **Compare** a page against competitors (saved sets, history, Markdown/CSV/JSON export).
+- **Fetch as bot** (Googlebot, Twitterbot, facebookexternalhit, TelegramBot,
+  Discordbot, WhatsApp, Slackbot, LinkedInBot, iMessage) with a diff against a browser UA.
+- Opt-in **probes**: soft 404, hreflang reciprocity, canonical target, broken links.
+- robots.txt (search + AI crawlers), sitemap (gzip, indexes), llms.txt, Web Vitals.
+
+Local only: no backend, no telemetry, no account.
+
+## Install (load unpacked)
+
+```sh
+pnpm install --frozen-lockfile
+pnpm build            # → .output/chrome-mv3
+```
+
+`chrome://extensions` → enable *Developer mode* → *Load unpacked* → pick
+`.output/chrome-mv3`. Click the toolbar icon to open the side panel.
+
+The first time you audit a site, Shirabe asks for access to that origin
+(`optional_host_permissions`). *Settings (⚙) → Grant access to all sites*
+does it once for every site (needed to check share images and links hosted
+elsewhere without asking).
+
+Web Vitals are collected by a small content script that is registered only for
+granted origins, at page load: after granting a site, reload the tab once.
+
+## Use
+
+| Tab | What it shows |
+|---|---|
+| Overview | Indexability verdict + reasons, score per category (click to filter), top issues, all findings, *Copy report* (Markdown) |
+| Meta | title / description with pixel-width estimates, canonical, robots meta + X-Robots-Tag, hreflang table, viewport, lang, charset, icons, theme-color (raw vs rendered when they differ) |
+| Share | Preview card per platform with the tag each value came from, image checks, crop simulation, debugger links |
+| Content | Headings outline, words raw vs rendered, links (internal/external/nofollow/not crawlable), clickable elements that are not links, images |
+| Schema | JSON-LD (pretty-printed), microdata/RDFa, page-type guess, Rich Results Test / Schema.org validator links |
+| Tech | Status, redirect chain, headers, weight breakdown (framework payloads, inline CSS, @font-face), Web Vitals, robots.txt / sitemap / llms.txt, fetch as bot, probes |
+| Compare | Comparison sets, batch raw audits (2 at a time, polite), best value per row, history (last 10 runs), exports |
+| Raw vs rendered | Counts, head values changed by JS, headings / links / text / JSON-LD only after JS |
+
+Probes never run automatically. Audits run automatically on granted sites
+(toggle in Settings).
+
+## Develop
+
+```sh
+pnpm dev              # WXT dev mode with HMR
+pnpm typecheck
+pnpm test             # Vitest: rules, parsers, acceptance cases (Chromium via Playwright)
+pnpm test:e2e         # builds with SHIRABE_E2E=1 and drives the real extension in Chromium
+pnpm fixtures:fetch   # optional: fetch the real audited pages into tests/fixtures/real/
+```
+
+Tests use the Chromium that ships with Playwright, or `/opt/pw-browsers/chromium`,
+or `CHROMIUM_PATH`. The e2e build (`.output/chrome-mv3-e2e`) has a blanket
+host permission so tests can run without the permission prompt; never load it
+in your own browser.
+
+## Layout
+
+```
+src/
+  entrypoints/
+    background.ts         service worker: fetches, redirect capture, bot UA, probes, compare
+    offscreen/            DOMParser for raw HTML (the service worker has none)
+    vitals.content.ts     web-vitals collector (registered at runtime per granted origin)
+    sidepanel/            React UI
+  lib/
+    extract/extractPage.ts  the extractor, shared by both views (self-contained, injected)
+    rules/                  rule engine + catalogue (pure functions)
+    share/                  platform rules loader, preview resolution, image checks
+    collect.ts              raw audit, site files, probes (network injected → testable)
+    compare.ts, diff.ts, report.ts, robots.ts, sitemap.ts, pixels.ts, url.ts, …
+  rules/
+    share/*.json            platform preview rules, with sources + lastVerified
+    schema.json             Google rich-result required/recommended properties
+    bots.json               User-Agents for "fetch as bot"
+tests/
+  fixtures/               synthetic pages reproducing the myanimetrip audit
+  unit/                   Vitest
+  e2e/                    Playwright with the extension loaded
+```
+
+See [docs/architecture.md](docs/architecture.md), [docs/rules.md](docs/rules.md)
+and [docs/supply-chain.md](docs/supply-chain.md).

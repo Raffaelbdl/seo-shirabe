@@ -199,4 +199,27 @@ export const contentRules: Rule[] = [
       return hits;
     },
   },
+  {
+    id: 'content.broken-links',
+    category: 'content',
+    view: 'probe',
+    title: 'No broken links',
+    why: 'Broken links waste crawl budget, leak link signals and frustrate users.',
+    fix: 'Update or remove the links listed (or redirect the targets).',
+    docs: DOCS.links,
+    check: ({ probes }) => {
+      const p = probes.links;
+      if (!p) return null;
+      const broken = p.checked.filter((c) => !c.skipped && !c.ok);
+      if (!broken.length) return [];
+      const internal = broken.filter((c) => c.status >= 400 && c.status < 500);
+      return [
+        {
+          severity: internal.length ? 'warning' : 'info',
+          title: `${plural(broken.length, 'broken link')}`,
+          value: sample(broken, 10, (c) => `${c.error ?? c.status} ${c.url}`),
+        },
+      ];
+    },
+  },
 ];
