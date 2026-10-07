@@ -23,10 +23,20 @@ Local only: no backend, no telemetry, no account.
 
 ## Install (load unpacked)
 
+Requires Node 22 and **pnpm** (the version is pinned in `package.json` →
+`packageManager`). With Corepack, which ships with Node 22, you get that exact
+version:
+
 ```sh
+corepack enable       # or, without Corepack: npm install -g pnpm@10.28.0
 pnpm install --frozen-lockfile
 pnpm build            # → .output/chrome-mv3
 ```
+
+Use pnpm rather than npm. npm ignores `pnpm-lock.yaml` (transitive
+dependencies would float), does not apply the 7-day `minimumReleaseAge`, runs
+dependency install scripts by default, and `test:e2e` calls pnpm. See
+[docs/supply-chain.md](docs/supply-chain.md).
 
 `chrome://extensions` → enable *Developer mode* → *Load unpacked* → pick
 `.output/chrome-mv3`. Click the toolbar icon to open the side panel.
