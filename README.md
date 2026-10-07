@@ -21,6 +21,20 @@ META SEO inspector:
 
 Local only: no backend, no telemetry, no account.
 
+## Screenshots
+
+Side panel auditing the synthetic test pages (`pnpm screenshots` regenerates them).
+
+| Overview | Share previews | Tech |
+|---|---|---|
+| <img src="docs/screenshots/overview.png" alt="Overview tab: indexability verdict, scores per category and top issues with why / fix" width="260"> | <img src="docs/screenshots/share.png" alt="Share tab: X and Facebook preview cards with the tag each value came from" width="260"> | <img src="docs/screenshots/tech.png" alt="Tech tab: response, weight breakdown with an 860 KB Angular payload and 414 inline font faces, Web Vitals" width="260"> |
+| **Content** | **Raw vs rendered** | |
+| <img src="docs/screenshots/content.png" alt="Content tab: 24 clickable divs reported as links crawlers cannot follow" width="260"> | <img src="docs/screenshots/raw-vs-rendered.png" alt="Raw vs rendered tab: 1 word in the raw HTML vs 924 after JavaScript" width="260"> | |
+
+**Compare**
+
+<img src="docs/screenshots/compare.png" alt="Compare tab: two pages side by side with the best value per row highlighted" width="640">
+
 ## Install
 
 ### From a release (no build needed)
@@ -91,6 +105,7 @@ pnpm typecheck
 pnpm test             # Vitest: rules, parsers, acceptance cases (Chromium via Playwright)
 pnpm test:e2e         # builds with SHIRABE_E2E=1 and drives the real extension in Chromium
 pnpm fixtures:fetch   # optional: fetch the real audited pages into tests/fixtures/real/
+pnpm screenshots      # regenerate docs/screenshots/ from the built extension
 ```
 
 Tests use the Chromium that ships with Playwright, or `/opt/pw-browsers/chromium`,
