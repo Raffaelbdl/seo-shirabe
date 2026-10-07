@@ -1,13 +1,10 @@
-# Publishes v<package.json version> as a GitHub release, either from
-# Actions → Release → "Run workflow" (creates the tag on the selected branch)
-# or by pushing the tag yourself: npm version patch && git push --follow-tags
+# Publishes v<package.json version> as a GitHub release from main:
+# Actions → Release → "Run workflow" on main. The tag is created by the release.
 # The release carries seo-shirabe-<version>-chrome.zip: unzip it and drag the
 # folder onto chrome://extensions (Developer mode on).
 name: Release
 
 on:
-  push:
-    tags: ['v*']
   workflow_dispatch:
 
 permissions:
@@ -15,6 +12,7 @@ permissions:
 
 jobs:
   check:
+    if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/ci.yml
 
   release:
@@ -31,18 +29,12 @@ jobs:
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - name: Resolve the tag from package.json
-        run: |
-          tag="v$(node -p "require('./package.json').version")"
-          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "$tag" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match package.json ($tag)"
-            exit 1
-          fi
-          echo "TAG=$tag" >> "$GITHUB_ENV"
+        run: echo "TAG=v$(node -p "require('./package.json').version")" >> "$GITHUB_ENV"
       - run: pnpm zip
       - name: Publish the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # --target creates the tag on this commit when it does not exist yet
+          # --target creates the tag on this main commit
           gh release create "$TAG" .output/seo-shirabe-*-chrome.zip \
             --target "$GITHUB_SHA" --title "Shirabe $TAG" --generate-notes
