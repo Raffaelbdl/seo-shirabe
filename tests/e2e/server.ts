@@ -28,18 +28,32 @@ function png(w: number, h: number): Buffer {
   ihdr.writeUInt32BE(h, 4);
   ihdr[8] = 8;
   ihdr[9] = 2;
-  const row = Buffer.concat([Buffer.from([0]), Buffer.alloc(w * 3, 0xc2)]);
-  const raw = Buffer.concat(Array.from({ length: h }, () => row));
+  // diagonal orange → pink gradient, so share previews look like a real image
+  const raw = Buffer.concat(
+    Array.from({ length: h }, (_, y) => {
+      const row = Buffer.alloc(1 + w * 3);
+      for (let x = 0; x < w; x++) {
+        const t = (x / w + y / h) / 2;
+        row.set([Math.round(232 - 20 * t), Math.round(89 + 40 * t), Math.round(60 + 110 * t)], 1 + x * 3);
+      }
+      return row;
+    }),
+  );
   return Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(raw)), chunk('IEND', Buffer.alloc(0))]);
 }
 
 export interface FixtureServer {
   origin: string;
+  port: number;
   userAgents: { path: string; ua: string }[];
   close(): Promise<void>;
 }
 
-export async function startServer(): Promise<FixtureServer> {
+/**
+ * @param publicOrigin origin the pages are reached at, when the browser maps a
+ * demo hostname to this server (--host-resolver-rules); defaults to 127.0.0.1.
+ */
+export async function startServer(publicOrigin?: string): Promise<FixtureServer> {
   const userAgents: { path: string; ua: string }[] = [];
   const og = png(1200, 630);
   let origin = '';
@@ -75,6 +89,7 @@ export async function startServer(): Promise<FixtureServer> {
     if (path === '/' || path === '/fr') return html(local(fixture('myanimetrip-home.html')));
     if (path === ANIME || path === '/fr/map/16bit%20Sensation%3A%20Another%20Layer') return html(local(fixture('myanimetrip-anime.html')));
     if (path === '/fr/map') return html(local(fixture('myanimetrip-map.html')));
+    if (path === '/en/map') return html(local(fixture('seichigo-map.html')));
     if (path === '/fr/blog/kamiina-botan-pelerinage-utsunomiya') {
       let body = local(fixture('myanimetrip-blog.html')).replace(`${origin}/assets/blog/kamiina-botan/og.jpg"`, `${origin}/og.png"`);
       // A prerender-style difference for bots, to exercise the bot diff.
@@ -85,6 +100,7 @@ export async function startServer(): Promise<FixtureServer> {
   });
   await new Promise<void>((r) => server.listen(0, '127.0.0.1', r));
   const addr = server.address();
-  origin = `http://127.0.0.1:${typeof addr === 'object' && addr ? addr.port : 0}`;
-  return { origin, userAgents, close: () => new Promise((r) => server.close(() => r())) };
+  const port = typeof addr === 'object' && addr ? addr.port : 0;
+  origin = publicOrigin ?? `http://127.0.0.1:${port}`;
+  return { origin, port, userAgents, close: () => new Promise((r) => server.close(() => r())) };
 }

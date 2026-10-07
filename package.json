@@ -16,7 +16,8 @@
     "test:e2e": "pnpm build:e2e && playwright test",
     "icons": "node scripts/make-icons.mjs",
     "fixtures:fetch": "node scripts/fetch-fixtures.mjs",
-    "postinstall": "wxt prepare"
+    "postinstall": "wxt prepare",
+    "screenshots": "pnpm build:e2e && SHIRABE_SCREENSHOTS=1 playwright test screenshots"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
