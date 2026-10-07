@@ -1,0 +1,72 @@
+{
+  "platform": "linkedin",
+  "name": "LinkedIn",
+  "fields": {
+    "title": [
+      "og:title",
+      "title"
+    ],
+    "description": [
+      "og:description",
+      "meta:description"
+    ],
+    "image": [
+      "og:image"
+    ],
+    "imageAlt": [],
+    "siteName": [],
+    "themeColor": []
+  },
+  "cardType": null,
+  "displays": {
+    "title": true,
+    "description": false,
+    "siteName": false,
+    "domain": true,
+    "image": true,
+    "imageAlt": false,
+    "themeColor": false
+  },
+  "truncate": {
+    "title": null,
+    "description": null
+  },
+  "image": {
+    "minWidth": 1200,
+    "minHeight": 627,
+    "recommendedWidth": 1200,
+    "recommendedHeight": 627,
+    "maxBytes": 5242880,
+    "displayRatio": 1.91,
+    "smallThumbnail": true,
+    "formats": [
+      "jpeg",
+      "png",
+      "gif"
+    ],
+    "unsupportedFormats": [
+      "svg"
+    ]
+  },
+  "debugger": {
+    "label": "LinkedIn Post Inspector",
+    "url": "https://www.linkedin.com/post-inspector/inspect/{url}"
+  },
+  "refreshNote": "Inspect the URL with LinkedIn Post Inspector to refresh the cached preview; otherwise LinkedIn caches shared-URL metadata for about 7 days. Already-published posts keep their old preview.",
+  "notes": [
+    "Official help article 'Make your website shareable on LinkedIn' (a521928): uses Open Graph tags (og:title, og:image, og:description, og:type...), og:image max 5MB, minimum 1200x627, ratio 1.91:1 (per search extracts; some third-party guides quote a 200px minimum width). minWidth/minHeight set to the documented 1200x627.",
+    "Behaviour change (2024): organic link posts show a small thumbnail image beside the title and domain instead of a full-width image; sponsored posts keep the large image. smallThumbnail=true reflects organic posts.",
+    "Feed card shows title and domain; og:description is not shown in the feed card. Title wraps to ~2 lines; truncation undocumented (null). A 150-char og:title figure appears only in third-party guides.",
+    "LinkedIn does not read twitter: tags. Formats: JPEG/PNG/GIF widely reported; webp support unclear; SVG not supported (estimates).",
+    "Verification method: official doc pages were located via web search (search-engine extracts of the official URLs listed in source); direct page fetches of the official domain were blocked from the research environment, so wording could not be re-read in full."
+  ],
+  "source": [
+    "https://www.linkedin.com/help/linkedin/answer/a521928",
+    "https://www.linkedin.com/post-inspector/",
+    "https://www.socialmediatoday.com/news/linkedin-updates-link-previews-organic-posts-smaller-images/717571/",
+    "https://searchengineland.com/linkedin-shrinks-link-previews-organic-posts-442819",
+    "https://link.boo/guides/linkedin-link-preview-not-showing",
+    "https://expandi.io/blog/linkedin-post-inspector/"
+  ],
+  "lastVerified": "2026-10-07"
+}

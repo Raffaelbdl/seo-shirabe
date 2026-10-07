@@ -1,0 +1,83 @@
+{
+  "platform": "telegram",
+  "name": "Telegram",
+  "fields": {
+    "title": [
+      "og:title",
+      "twitter:title",
+      "title"
+    ],
+    "description": [
+      "og:description",
+      "twitter:description",
+      "meta:description"
+    ],
+    "image": [
+      "og:image",
+      "twitter:image"
+    ],
+    "imageAlt": [],
+    "siteName": [
+      "og:site_name"
+    ],
+    "themeColor": []
+  },
+  "cardType": {
+    "tag": "twitter:card",
+    "default": "summary"
+  },
+  "displays": {
+    "title": true,
+    "description": true,
+    "siteName": true,
+    "domain": false,
+    "image": true,
+    "imageAlt": false,
+    "themeColor": false
+  },
+  "truncate": {
+    "title": null,
+    "description": null
+  },
+  "image": {
+    "minWidth": 200,
+    "minHeight": 200,
+    "recommendedWidth": 1200,
+    "recommendedHeight": 630,
+    "maxBytes": null,
+    "displayRatio": null,
+    "smallThumbnail": false,
+    "formats": [
+      "jpeg",
+      "png",
+      "webp",
+      "gif"
+    ],
+    "unsupportedFormats": [
+      "svg"
+    ]
+  },
+  "debugger": null,
+  "refreshNote": "Send the URL (up to 10 links per message) to the official @WebpageBot (https://t.me/WebpageBot) in Telegram; it re-fetches and updates the cached preview for future shares. Already-sent messages keep their old preview.",
+  "notes": [
+    "Telegram has no official public documentation of its link-preview parser; field fallbacks, the large/small image rule and image sizes here come from secondary sources (opengraphplus.com, ogpreview.app, enterno.io) and are estimates.",
+    "Large vs small rule (secondary sources): twitter:card=summary_large_image shows the image full width; 'summary' or a missing twitter:card shows a small thumbnail at the right of the text even for a 1200x630 image. Some reports also tie large media to image size; treat as uncertain.",
+    "Since the Dec 2023 'Replies 2.0, Adjustable Link Previews' update, the sender can choose larger/smaller media and preview above/below the text (Bot API LinkPreviewOptions.prefer_large_media / prefer_small_media / show_above_text), so the final size is partly user-controlled.",
+    "Layout: site name (accent colour, bold) / title (bold) / description, inside a coloured left-bar block. Title and description wrap over several lines rather than a fixed character cut; truncation set to null (unknown).",
+    "Image minimum 200x200 and 1200x630 recommendation are secondary-source estimates; no documented max bytes (null). SVG not rendered (estimate); webp believed to work (estimate).",
+    "Pages with an Instant View template show an 'Instant View' button; that is configured via instantview.telegram.org templates, not meta tags.",
+    "Verification method: official doc pages were located via web search (search-engine extracts of the official URLs listed in source); direct page fetches of the official domain were blocked from the research environment, so wording could not be re-read in full."
+  ],
+  "source": [
+    "https://core.telegram.org/bots/webpagebot",
+    "https://telegram.org/blog/reply-revolution",
+    "https://core.telegram.org/bots/api#linkpreviewoptions",
+    "https://docs.python-telegram-bot.org/en/v22.6/telegram.linkpreviewoptions.html",
+    "https://opengraphplus.com/consumers/telegram/tags",
+    "https://opengraphplus.com/consumers/telegram/images",
+    "https://ogpreview.app/open-graph/telegram",
+    "https://support.wix.com/en/article/updating-your-pages-link-preview-in-telegram",
+    "https://medium.com/@kapxapot/how-to-update-the-page-preview-in-telegram-beb24ddae5df"
+  ],
+  "lastVerified": "2026-10-07"
+}

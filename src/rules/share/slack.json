@@ -1,0 +1,81 @@
+{
+  "platform": "slack",
+  "name": "Slack",
+  "fields": {
+    "title": [
+      "og:title",
+      "twitter:title",
+      "title"
+    ],
+    "description": [
+      "og:description",
+      "twitter:description",
+      "meta:description"
+    ],
+    "image": [
+      "og:image",
+      "twitter:image"
+    ],
+    "imageAlt": [],
+    "siteName": [
+      "og:site_name",
+      "host"
+    ],
+    "themeColor": []
+  },
+  "cardType": {
+    "tag": "twitter:card",
+    "default": "summary"
+  },
+  "displays": {
+    "title": true,
+    "description": true,
+    "siteName": true,
+    "domain": false,
+    "image": true,
+    "imageAlt": false,
+    "themeColor": false
+  },
+  "truncate": {
+    "title": null,
+    "description": null
+  },
+  "image": {
+    "minWidth": null,
+    "minHeight": null,
+    "recommendedWidth": 1200,
+    "recommendedHeight": 630,
+    "maxBytes": null,
+    "displayRatio": null,
+    "smallThumbnail": false,
+    "formats": [
+      "jpeg",
+      "png",
+      "gif",
+      "webp"
+    ],
+    "unsupportedFormats": [
+      "svg"
+    ]
+  },
+  "debugger": null,
+  "refreshNote": "No official re-scrape tool. Slackbot-LinkExpanding responses are cached globally across Slack for around 30 minutes (api.slack.com/robots); after that, or with a changed URL (e.g. ?v=2), a new post re-fetches.",
+  "notes": [
+    "Official (Slack Robots page): Slackbot-LinkExpanding fetches as little of the page as possible using HTTP Range headers and looks for oEmbed and Twitter Card / Open Graph tags; it also fetches referenced images/video/audio to check validity; responses cached ~30 minutes.",
+    "Slack developer blog: order is oEmbed first, then Twitter Card / Open Graph tags (whichever appears first in the HTML wins), then plain HTML meta tags. The fallback chain here (og before twitter) is a simplification - Slack actually prefers whichever tag comes first in the document.",
+    "twitter:label1/twitter:data1 and twitter:label2/twitter:data2 can add up to two extra label/value lines (not representable in this schema).",
+    "Layout: favicon + site name (og:site_name, else the host) on top, bold linked title, description, then image; grey left bar (theme-color not used, per available evidence).",
+    "Image: summary_large_image shows a large image; 'summary' shows a small square thumbnail at the right. Reports conflict on what happens without twitter:card - treat default as uncertain. Slack only honours the first twitter:card declaration. No documented size/byte limits (null); a ~60x60 minimum is a secondary-source claim. Some third-party sources say only the first ~32KB of HTML is read (unverified).",
+    "Truncation of title/description is not documented (null).",
+    "Verification method: official doc pages were located via web search (search-engine extracts of the official URLs listed in source); direct page fetches of the official domain were blocked from the research environment, so wording could not be re-read in full."
+  ],
+  "source": [
+    "https://api.slack.com/robots",
+    "https://docs.slack.dev/messaging/unfurling-links-in-messages/",
+    "https://medium.com/slack-developer-blog/everything-you-ever-wanted-to-know-about-unfurling-but-were-afraid-to-ask-or-how-to-make-your-e64b4bb9254",
+    "https://whitep4nth3r.com/blog/level-up-your-link-previews-in-slack/",
+    "https://forums.swift.org/t/site-logo-is-giant-in-discord-and-slack-embeds/12505",
+    "https://opengraphplus.com/consumers/slack/tags"
+  ],
+  "lastVerified": "2026-10-07"
+}

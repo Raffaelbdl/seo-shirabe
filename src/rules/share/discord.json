@@ -1,0 +1,82 @@
+{
+  "platform": "discord",
+  "name": "Discord",
+  "fields": {
+    "title": [
+      "og:title",
+      "twitter:title",
+      "title"
+    ],
+    "description": [
+      "og:description",
+      "twitter:description",
+      "meta:description"
+    ],
+    "image": [
+      "og:image",
+      "twitter:image"
+    ],
+    "imageAlt": [],
+    "siteName": [
+      "og:site_name"
+    ],
+    "themeColor": [
+      "meta:theme-color"
+    ]
+  },
+  "cardType": {
+    "tag": "twitter:card",
+    "default": "summary"
+  },
+  "displays": {
+    "title": true,
+    "description": true,
+    "siteName": true,
+    "domain": false,
+    "image": true,
+    "imageAlt": false,
+    "themeColor": true
+  },
+  "truncate": {
+    "title": 256,
+    "description": 350
+  },
+  "image": {
+    "minWidth": null,
+    "minHeight": null,
+    "recommendedWidth": 1200,
+    "recommendedHeight": 630,
+    "maxBytes": null,
+    "displayRatio": null,
+    "smallThumbnail": false,
+    "formats": [
+      "jpeg",
+      "png",
+      "gif",
+      "webp"
+    ],
+    "unsupportedFormats": [
+      "svg"
+    ]
+  },
+  "debugger": null,
+  "refreshNote": "No official re-scrape tool. Discord caches link embeds server-side; append a query string (e.g. ?v=2) to force a fresh fetch. The Discordbot support article says images/videos are proxied and cached for a while through Discord's servers.",
+  "notes": [
+    "Official: support article 'About Discord Link Previews and the Discordbot' describes Discordbot fetching title/description/image only when a link is posted, and proxying media through Discord's servers; it does not document individual tags.",
+    "Layout (secondary sources): coloured left bar (meta theme-color), site name (og:site_name, small) above a bold linked title, description, then image. theme-color is a Discord-specific behaviour among these platforms.",
+    "Large vs small: twitter:card=summary_large_image puts a large image below the text; otherwise og:image is a small (~80x80) thumbnail to the right (secondary sources).",
+    "Truncation: title 256 is the documented embed-object limit from Discord's API docs (applies to embeds, assumed for link previews); description ~350 chars is a secondary-source estimate for link previews (API embeds allow 4096).",
+    "No documented image minimum/max bytes for link embeds (null). Recommended 1200x630 is a common secondary recommendation. webp in og:image is believed to render (Discord's media proxy serves webp) but there are community reports of problems with (animated) webp - uncertain. SVG not rendered (estimate).",
+    "og:image:alt is not shown.",
+    "Verification method: official doc pages were located via web search (search-engine extracts of the official URLs listed in source); direct page fetches of the official domain were blocked from the research environment, so wording could not be re-read in full."
+  ],
+  "source": [
+    "https://support.discord.com/hc/en-us/articles/42500550752919-About-Discord-Link-Previews-and-the-Discordbot",
+    "https://raw.githubusercontent.com/discord/discord-api-docs/main/developers/resources/message.mdx",
+    "https://opengraphplus.com/consumers/discord/tags",
+    "https://previewog.com/discord-link-preview/",
+    "https://analogfeelings.github.io/knowledge/discord-website-embeds/",
+    "https://support.discord.com/hc/en-us/community/posts/21955653968535-Webp-file-in-Discord-Embed"
+  ],
+  "lastVerified": "2026-10-07"
+}

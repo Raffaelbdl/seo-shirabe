@@ -1,0 +1,81 @@
+{
+  "platform": "facebook",
+  "name": "Facebook",
+  "fields": {
+    "title": [
+      "og:title",
+      "title"
+    ],
+    "description": [
+      "og:description",
+      "meta:description"
+    ],
+    "image": [
+      "og:image"
+    ],
+    "imageAlt": [
+      "og:image:alt"
+    ],
+    "siteName": [
+      "og:site_name"
+    ],
+    "themeColor": []
+  },
+  "cardType": null,
+  "displays": {
+    "title": true,
+    "description": true,
+    "siteName": false,
+    "domain": true,
+    "image": true,
+    "imageAlt": false,
+    "themeColor": false
+  },
+  "truncate": {
+    "title": null,
+    "description": null
+  },
+  "image": {
+    "minWidth": 200,
+    "minHeight": 200,
+    "recommendedWidth": 1200,
+    "recommendedHeight": 630,
+    "maxBytes": 8388608,
+    "displayRatio": 1.91,
+    "smallThumbnail": false,
+    "formats": [
+      "jpeg",
+      "png",
+      "gif",
+      "webp"
+    ],
+    "unsupportedFormats": [
+      "svg"
+    ]
+  },
+  "debugger": {
+    "label": "Meta Sharing Debugger",
+    "url": "https://developers.facebook.com/tools/debug/?q={url}"
+  },
+  "refreshNote": "Use the Sharing Debugger ('Scrape Again') or a Graph API POST with scrape=true. Otherwise Meta refreshes link metadata automatically about every 30 days. To change an image, use a new image URL so the cached image is not reused.",
+  "notes": [
+    "Official (Sharing for Webmasters / Images): minimum 200x200; use at least 1200x630 for high-resolution displays; at least 600x315 for the large link-preview layout - smaller images still display but much smaller; aspect ratio ~1.91:1; max 8MB.",
+    "Images are cached asynchronously, so the image may not render the first time a URL is shared; specify og:image:width/height to allow immediate rendering.",
+    "Displayed: image, domain (uppercase), title, and often one line of description. Description is frequently hidden or cut in the mobile feed; og:site_name is read but the card shows the domain. Truncation is line-based and undocumented (null).",
+    "Fallbacks to <title>/meta description are inferred (Sharing Debugger reports 'inferred property' warnings when og: tags are missing); Meta may also infer an image from page content, which the token list cannot represent.",
+    "webp listed by secondary sources as supported, but some users report Sharing Debugger failures with webp - JPEG/PNG are the safe choice. SVG not supported.",
+    "og:image:alt is used for screen readers, not displayed visually.",
+    "Crawler must get OG tags within the first 1MB of the page; the same crawler (facebookexternalhit) serves Facebook, Instagram, Messenger and Threads link previews.",
+    "Verification method: official doc pages were located via web search (search-engine extracts of the official URLs listed in source); direct page fetches of the official domain were blocked from the research environment, so wording could not be re-read in full."
+  ],
+  "source": [
+    "https://developers.facebook.com/docs/sharing/webmasters/",
+    "https://developers.facebook.com/documentation/sharing/webmasters/images",
+    "https://developers.facebook.com/documentation/sharing/webmasters/getting-started/change-link",
+    "https://developers.facebook.com/docs/sharing/webmasters/crawler",
+    "https://developers.facebook.com/docs/sharing/webmasters/faq",
+    "https://developers.facebook.com/tools/debug/",
+    "https://forum.blocsapp.com/t/webp-images-dont-work-in-social-cards-og-image/25200"
+  ],
+  "lastVerified": "2026-10-07"
+}

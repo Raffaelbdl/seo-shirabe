@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Seichigo Map</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<div id="app">Loading...</div>
+<script>
+(function () {
+  var app = document.getElementById('app');
+  var html = '<h1>Anime pilgrimage map</h1><p>Browse anime locations across Japan on an interactive map, filter by series, prefecture and season, and save spots to your trip.</p><ul>';
+  for (var i = 0; i < 60; i++) {
+    html += '<li><a href="/en/anime/series-' + i + '">Series ' + i + '</a> — real locations from the anime, with photos, directions and visiting tips for fans.</li>';
+  }
+  html += '</ul>';
+  app.innerHTML = html;
+})();
+</script>
+</body>
+</html>

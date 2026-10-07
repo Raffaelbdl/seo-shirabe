@@ -1,0 +1,59 @@
+{
+  "bots": [
+    {
+      "id": "googlebot-smartphone",
+      "label": "Googlebot smartphone",
+      "userAgent": "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+      "source": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers"
+    },
+    {
+      "id": "twitterbot",
+      "label": "Twitterbot (X)",
+      "userAgent": "Twitterbot/1.0",
+      "source": "https://developer.twitter.com/en/docs/twitter-for-websites/cards/guides/troubleshooting-cards"
+    },
+    {
+      "id": "facebookexternalhit",
+      "label": "facebookexternalhit (Meta)",
+      "userAgent": "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)",
+      "source": "https://developers.facebook.com/docs/sharing/webmasters/crawler"
+    },
+    {
+      "id": "telegrambot",
+      "label": "TelegramBot",
+      "userAgent": "TelegramBot (like TwitterBot)",
+      "source": "https://usehall.com/agents/telegrambot"
+    },
+    {
+      "id": "discordbot",
+      "label": "Discordbot",
+      "userAgent": "Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)",
+      "source": "https://support.discord.com/hc/en-us/articles/42500550752919-About-Discord-Link-Previews-and-the-Discordbot"
+    },
+    {
+      "id": "whatsapp",
+      "label": "WhatsApp",
+      "userAgent": "WhatsApp/2.22.20.72 A",
+      "source": "https://developers.facebook.com/documentation/business-messaging/whatsapp/link-previews/"
+    },
+    {
+      "id": "slackbot-linkexpanding",
+      "label": "Slackbot-LinkExpanding",
+      "userAgent": "Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)",
+      "source": "https://api.slack.com/robots"
+    },
+    {
+      "id": "linkedinbot",
+      "label": "LinkedInBot",
+      "userAgent": "LinkedInBot/1.0 (compatible; Mozilla/5.0; Apache-HttpClient +http://www.linkedin.com)",
+      "source": "https://www.linkedin.com/help/linkedin/answer/a521928"
+    },
+    {
+      "id": "imessage",
+      "label": "Apple Messages link preview",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/601.2.4 (KHTML, like Gecko) Version/9.0.1 Safari/601.2.4 facebookexternalhit/1.1 Facebot Twitterbot/1.0",
+      "source": "https://docs.centinelanalytica.com/crawlers/apple-link-preview"
+    }
+  ],
+  "lastVerified": "2026-10-07"
+}

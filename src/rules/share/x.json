@@ -1,0 +1,86 @@
+{
+  "platform": "x",
+  "name": "X (Twitter)",
+  "fields": {
+    "title": [
+      "twitter:title",
+      "og:title",
+      "title"
+    ],
+    "description": [
+      "twitter:description",
+      "og:description",
+      "meta:description"
+    ],
+    "image": [
+      "twitter:image",
+      "og:image"
+    ],
+    "imageAlt": [
+      "twitter:image:alt",
+      "og:image:alt"
+    ],
+    "siteName": [
+      "og:site_name"
+    ],
+    "themeColor": []
+  },
+  "cardType": {
+    "tag": "twitter:card",
+    "default": "summary"
+  },
+  "displays": {
+    "title": true,
+    "description": false,
+    "siteName": false,
+    "domain": true,
+    "image": true,
+    "imageAlt": false,
+    "themeColor": false
+  },
+  "truncate": {
+    "title": 70,
+    "description": 200
+  },
+  "image": {
+    "minWidth": 300,
+    "minHeight": 157,
+    "recommendedWidth": 1200,
+    "recommendedHeight": 628,
+    "maxBytes": 5242880,
+    "displayRatio": 2,
+    "smallThumbnail": false,
+    "formats": [
+      "jpeg",
+      "png",
+      "webp",
+      "gif"
+    ],
+    "unsupportedFormats": [
+      "svg"
+    ]
+  },
+  "debugger": null,
+  "refreshNote": "No official cache-busting tool any more. The Card Validator (cards-dev.x.com/validator) no longer renders previews; X says to preview by pasting the URL into the post composer. Changing the URL (e.g. adding a query string) forces a fresh fetch; X does not publish its cache TTL.",
+  "notes": [
+    "X developer docs (Cards markup): twitter:title max 70 chars, twitter:description max 200 chars, twitter:image:alt max 420 chars; twitter:title/description/image fall back to og:title/og:description/og:image. The 70/200 values are documented maxima, not measured on-screen truncation.",
+    "summary_large_image: min 300x157, recommended 1200x628, cropped to 2:1 (per docs/search extracts; some secondary guides quote 1.91:1). Images must be < 5MB; JPG, PNG, WEBP, GIF supported, only the first frame of an animated GIF is used; SVG not supported.",
+    "summary card (the documented default): square thumbnail, min 144x144, max 4096x4096, 5MB, cropped 1:1 (secondary sources). A mock should switch to a small square thumbnail when twitter:card is 'summary' or missing.",
+    "Behaviour change: in Oct 2023 X removed headline and description from link cards (image + domain overlay only). From late Nov 2023 / Jan 2024 X began overlaying the title as small white text on a dark box at the bottom-left of the image; secondary reporting (2025) says organic posts still show the headline over the image with no description panel. Domain is shown ('From example.com' below / overlay on the image).",
+    "Description is not shown on large-image cards in the timeline; whether the summary (small-thumbnail) layout shows the description varies by client - treat as uncertain.",
+    "twitter:card has no OG fallback; without it X may still render a card from OG tags, but layout defaults to summary (secondary sources).",
+    "twitter:image:alt is used for accessibility only (not rendered visibly).",
+    "Verification method: official doc pages were located via web search (search-engine extracts of the official URLs listed in source); direct page fetches of the official domain were blocked from the research environment, so wording could not be re-read in full."
+  ],
+  "source": [
+    "https://developer.x.com/en/docs/x-for-websites/cards/overview/markup",
+    "https://developer.x.com/cards/markup",
+    "https://developer.twitter.com/en/docs/twitter-for-websites/cards/guides/troubleshooting-cards",
+    "https://www.socialmediatoday.com/news/xs-updated-link-preview-format-removes-headlines-descriptions/695681/",
+    "https://www.socialmediatoday.com/news/x-bringing-post-headlines-back-link-previews-in-stream/700641/",
+    "https://9to5google.com/2024/01/04/twitter-x-headlines-link-preview/",
+    "https://alternativeto.net/news/2024/1/x-brings-back-headlines-in-link-previews-but-you-might-not-even-notice",
+    "https://onurdan.medium.com/how-to-validate-twitter-cards-after-x-removed-card-validator-ffcbbe65a409"
+  ],
+  "lastVerified": "2026-10-07"
+}

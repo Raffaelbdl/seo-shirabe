@@ -1,0 +1,36 @@
+{
+  "name": "seo-shirabe",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Shirabe (調べ) — SEO & share-preview inspector Chrome extension",
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "dev": "wxt",
+    "build": "wxt build",
+    "build:e2e": "SHIRABE_E2E=1 wxt build",
+    "zip": "wxt zip",
+    "typecheck": "wxt prepare && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "pnpm build:e2e && playwright test",
+    "icons": "node scripts/make-icons.mjs",
+    "fixtures:fetch": "node scripts/fetch-fixtures.mjs",
+    "postinstall": "wxt prepare"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/chrome": "0.3.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "5.9.3",
+    "vite": "8.3.1",
+    "vitest": "5.0.2",
+    "wxt": "0.21.4"
+  },
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "web-vitals": "6.2.2"
+  }
+}

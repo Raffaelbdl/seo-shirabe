@@ -1,0 +1,70 @@
+{
+  "platform": "google",
+  "name": "Google Search",
+  "fields": {
+    "title": [
+      "title",
+      "og:title"
+    ],
+    "description": [
+      "meta:description"
+    ],
+    "image": [],
+    "imageAlt": [],
+    "siteName": [
+      "og:site_name",
+      "host"
+    ],
+    "themeColor": []
+  },
+  "cardType": null,
+  "displays": {
+    "title": true,
+    "description": true,
+    "siteName": true,
+    "domain": true,
+    "image": false,
+    "imageAlt": false,
+    "themeColor": false
+  },
+  "truncate": {
+    "titlePx": 600,
+    "descriptionPx": 920,
+    "descriptionPxMobile": 680
+  },
+  "image": {
+    "minWidth": null,
+    "minHeight": null,
+    "recommendedWidth": null,
+    "recommendedHeight": null,
+    "maxBytes": null,
+    "displayRatio": null,
+    "smallThumbnail": false,
+    "formats": [],
+    "unsupportedFormats": []
+  },
+  "debugger": {
+    "label": "Google Rich Results Test",
+    "url": "https://search.google.com/test/rich-results?url={url}"
+  },
+  "refreshNote": "Request recrawl via the URL Inspection tool in Google Search Console (requires site ownership); otherwise changes appear after Google recrawls and reprocesses the page.",
+  "notes": [
+    "Title links (Search Central): generated automatically from <title> (primary), the main visual title, headings (<h1>), og:title, other large/prominent text, anchor text on the page and links to the page, and WebSite structured data. Google may rewrite titles that are vague, boilerplate or spammy. The fallback chain here is a simplification.",
+    "Snippets: primarily created from page content; Google sometimes uses the meta description when it describes the page better. Snippets are query-dependent and truncated to fit device width; there is no fixed length. max-snippet robots directive caps snippet length.",
+    "Site names: Google uses WebSite structured data (name, alternateName) on the homepage as the primary signal, plus og:site_name, homepage <title>/headings and other signals; falls back to the domain/host. WebSite structured data cannot be expressed with the allowed tokens.",
+    "Favicons: <link rel=icon> on the homepage; must be square, minimum 8x8, recommended larger than 48x48; any valid favicon format; must be crawlable by Googlebot and Googlebot-Image. Favicon is displayed but is not one of the schema's image fields.",
+    "Pixel truncation values are ESTIMATES (commonly used SEO-tool values: ~600px desktop title, ~920px desktop description, ~680px mobile description); Google does not document them.",
+    "Image: classic web results do not use og:image; Google may show a page thumbnail on mobile chosen from on-page images (controlled by max-image-preview), so image display is false and image specs are null.",
+    "Rich Results Test validates structured data only; it does not preview the title link or snippet.",
+    "Verification method: official doc pages were located via web search (search-engine extracts of the official URLs listed in source); direct page fetches of the official domain were blocked from the research environment, so wording could not be re-read in full."
+  ],
+  "source": [
+    "https://developers.google.com/search/docs/appearance/title-link",
+    "https://developers.google.com/search/docs/appearance/snippet",
+    "https://developers.google.com/search/docs/appearance/site-names",
+    "https://developers.google.com/search/blog/2023/07/sitenames",
+    "https://developers.google.com/search/docs/appearance/favicon-in-search",
+    "https://search.google.com/test/rich-results"
+  ],
+  "lastVerified": "2026-10-07"
+}

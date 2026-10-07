@@ -1,0 +1,69 @@
+{
+  "platform": "imessage",
+  "name": "iMessage (Apple Messages)",
+  "fields": {
+    "title": [
+      "og:title",
+      "title"
+    ],
+    "description": [
+      "og:description"
+    ],
+    "image": [
+      "og:image"
+    ],
+    "imageAlt": [],
+    "siteName": [
+      "og:site_name"
+    ],
+    "themeColor": []
+  },
+  "cardType": null,
+  "displays": {
+    "title": true,
+    "description": false,
+    "siteName": false,
+    "domain": true,
+    "image": true,
+    "imageAlt": false,
+    "themeColor": false
+  },
+  "truncate": {
+    "title": null,
+    "description": null
+  },
+  "image": {
+    "minWidth": 150,
+    "minHeight": null,
+    "recommendedWidth": 900,
+    "recommendedHeight": null,
+    "maxBytes": 10485760,
+    "displayRatio": null,
+    "smallThumbnail": false,
+    "formats": [
+      "jpeg",
+      "png",
+      "gif"
+    ],
+    "unsupportedFormats": [
+      "svg"
+    ]
+  },
+  "debugger": null,
+  "refreshNote": "No official tool. Previews are generated on the sender's device when the link is sent; there is no server-side cache to purge. Changing the URL forces a new fetch.",
+  "notes": [
+    "Official (Apple TN3156 'Create rich previews for Messages', 2024-04-30, formerly TN2444): default preview is a grey bubble with page title, domain and small icon; og:image adds a large image; og:title sets the title; use og:site_name for the site name rather than putting branding in og:title.",
+    "Images should be at least 900px wide; images under 150px wide may be ignored or shown as icons (minWidth=150 is that threshold, recommendedWidth=900). Icons should be square, >= 108px (apple-touch-icon / favicon / <link rel> icon). Main HTML resource limited to 1MB; total of icons/images/videos limited to 10MB (maxBytes=10485760 is that total). Apple notes these are guidelines that may change.",
+    "og:video or twitter:player:stream pointing to a playable file (e.g. MP4) autoplays inline; HLS needs a tap.",
+    "og:description is shown only for social-network post previews (which also require twitter:card summary/summary_large_image and a link rel=alternate type=application/activity+json); ordinary pages show title + domain only.",
+    "No JavaScript and no meta-refresh redirects are followed; server redirects are. Image crop ratio not documented (null). Format list is an estimate (JPEG/PNG/GIF); SVG not supported (estimate).",
+    "The fetch is made from the sender's device with a Safari UA that appends 'facebookexternalhit/1.1 Facebot Twitterbot/1.0' (secondary sources).",
+    "Source note: TN3156 was fetched directly from developer.apple.com (JSON) and read in full."
+  ],
+  "source": [
+    "https://developer.apple.com/documentation/technotes/tn3156-create-rich-previews-for-messages",
+    "https://developer.apple.com/library/archive/technotes/tn2444/_index.html",
+    "https://docs.centinelanalytica.com/crawlers/apple-link-preview"
+  ],
+  "lastVerified": "2026-10-07"
+}

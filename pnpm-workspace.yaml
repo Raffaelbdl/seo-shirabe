@@ -1,0 +1,7 @@
+# Supply-chain policy (see docs/supply-chain.md):
+# - only install versions published at least 7 days ago
+# - dependency lifecycle scripts are blocked except for this allowlist
+minimumReleaseAge: 10080
+onlyBuiltDependencies:
+  - esbuild
+strictDepBuilds: false

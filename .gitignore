@@ -1,0 +1,10 @@
+node_modules/
+.output/
+.wxt/
+dist/
+test-results/
+playwright-report/
+*.log
+.DS_Store
+# Real-site fixtures are fetched locally by scripts/fetch-fixtures.mjs.
+tests/fixtures/real/*.html

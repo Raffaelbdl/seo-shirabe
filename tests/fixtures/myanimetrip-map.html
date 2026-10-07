@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Carte des animes - MyAnimeTrip</title>
+<meta name="description" content="Tous les animes avec des lieux de pèlerinage réels au Japon, sur une carte interactive.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="canonical" href="https://myanimetrip.com/fr/map">
+<style>
+.anime-list{display:grid;grid-template-columns:repeat(4,200px);gap:12px}
+.anime-card{cursor:pointer;border:1px solid #ddd;padding:8px}
+.anime-card img{width:180px;height:250px;display:block}
+</style>
+</head>
+<body>
+<app-root>
+<header><nav><a href="/fr">Accueil</a> <a href="/fr/map">Carte</a> <a href="/fr/events">Événements</a></nav></header>
+<main>
+<h1>Carte des animes</h1>
+<div class="anime-list">
+{{ANIME_CARDS:24}}
+</div>
+</main>
+</app-root>
+<script>
+document.querySelectorAll('.anime-card').forEach(function (el) {
+  el.addEventListener('click', function () { location.href = '/fr/map/' + encodeURIComponent(el.dataset.title); });
+});
+</script>
+</body>
+</html>

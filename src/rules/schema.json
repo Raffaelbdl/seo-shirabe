@@ -1,0 +1,79 @@
+{
+  "types": {
+    "Article": {
+      "aliases": ["NewsArticle", "BlogPosting", "TechArticle", "Report"],
+      "required": [],
+      "recommended": ["headline", "image", "datePublished", "dateModified", "author"],
+      "docs": "https://developers.google.com/search/docs/appearance/structured-data/article",
+      "note": "Google lists no required properties for Article; the recommended ones improve how the page appears."
+    },
+    "BreadcrumbList": {
+      "aliases": [],
+      "required": ["itemListElement"],
+      "recommended": [],
+      "listItem": { "required": ["position", "name"], "recommended": ["item"] },
+      "docs": "https://developers.google.com/search/docs/appearance/structured-data/breadcrumb",
+      "note": "Each ListItem needs position and name; item (URL) may be omitted only on the last crumb."
+    },
+    "Event": {
+      "aliases": ["MusicEvent", "Festival", "ExhibitionEvent", "ScreeningEvent", "TheaterEvent", "SportsEvent", "SocialEvent", "BusinessEvent", "ComedyEvent", "DanceEvent", "EducationEvent", "FoodEvent", "LiteraryEvent", "SaleEvent", "ChildrensEvent", "CourseInstance", "VisualArtsEvent", "Hackathon"],
+      "required": ["name", "startDate", "location"],
+      "recommended": ["description", "endDate", "eventStatus", "eventAttendanceMode", "image", "offers", "organizer", "performer"],
+      "docs": "https://developers.google.com/search/docs/appearance/structured-data/event",
+      "note": "location is a Place with an address, or a VirtualLocation with a url for online events."
+    },
+    "VideoObject": {
+      "aliases": [],
+      "required": ["name", "thumbnailUrl", "uploadDate"],
+      "recommended": ["description", "contentUrl", "embedUrl", "duration"],
+      "docs": "https://developers.google.com/search/docs/appearance/structured-data/video",
+      "note": "uploadDate should include a timezone."
+    },
+    "ItemList": {
+      "aliases": [],
+      "required": ["itemListElement"],
+      "recommended": [],
+      "listItem": { "required": ["position"], "recommended": ["url"] },
+      "docs": "https://developers.google.com/search/docs/appearance/structured-data/carousel",
+      "note": "Carousels (summary page + detail pages) need ListItem.position and ListItem.url pointing to pages on the same domain."
+    },
+    "FAQPage": {
+      "aliases": [],
+      "required": ["mainEntity"],
+      "recommended": [],
+      "docs": "https://developers.google.com/search/docs/appearance/structured-data/faqpage",
+      "note": "Since August 2023 Google shows FAQ rich results only for well-known, authoritative government and health sites. The markup is still valid for other engines."
+    },
+    "Organization": {
+      "aliases": ["LocalBusiness", "Corporation", "OnlineStore", "NGO", "EducationalOrganization"],
+      "required": [],
+      "recommended": ["name", "url", "logo", "sameAs"],
+      "docs": "https://developers.google.com/search/docs/appearance/structured-data/organization",
+      "note": "Google lists no required properties; add as many recommended ones as apply. Usually placed on the homepage or an about page."
+    },
+    "WebSite": {
+      "aliases": [],
+      "required": ["name", "url"],
+      "recommended": ["alternateName"],
+      "docs": "https://developers.google.com/search/docs/appearance/site-names",
+      "note": "Used for the site name in results; must be on the homepage (domain-level root)."
+    },
+    "Product": {
+      "aliases": [],
+      "required": ["name"],
+      "requiredOneOf": [["offers", "review", "aggregateRating"]],
+      "recommended": ["image", "description", "brand", "sku"],
+      "docs": "https://developers.google.com/search/docs/appearance/structured-data/product-snippet",
+      "note": "Product snippets need name plus one of offers, review or aggregateRating."
+    }
+  },
+  "source": [
+    "https://developers.google.com/search/docs/appearance/structured-data/search-gallery",
+    "https://developers.google.com/search/docs/appearance/structured-data/event",
+    "https://developers.google.com/search/docs/appearance/structured-data/video",
+    "https://developers.google.com/search/docs/appearance/site-names",
+    "https://developers.google.com/search/blog/2023/08/howto-faq-changes"
+  ],
+  "verificationNote": "Official pages could not be fetched from the build environment (egress blocked); requirements were checked against search-engine extracts of the official URLs. Re-read the pages when updating.",
+  "lastVerified": "2026-10-07"
+}

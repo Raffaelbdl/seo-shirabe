@@ -1,0 +1,69 @@
+{
+  "platform": "whatsapp",
+  "name": "WhatsApp",
+  "fields": {
+    "title": [
+      "og:title",
+      "title"
+    ],
+    "description": [
+      "og:description",
+      "meta:description"
+    ],
+    "image": [
+      "og:image"
+    ],
+    "imageAlt": [],
+    "siteName": [],
+    "themeColor": []
+  },
+  "cardType": null,
+  "displays": {
+    "title": true,
+    "description": true,
+    "siteName": false,
+    "domain": true,
+    "image": true,
+    "imageAlt": false,
+    "themeColor": false
+  },
+  "truncate": {
+    "title": null,
+    "description": null
+  },
+  "image": {
+    "minWidth": 300,
+    "minHeight": null,
+    "recommendedWidth": 1200,
+    "recommendedHeight": 630,
+    "maxBytes": 614400,
+    "displayRatio": null,
+    "smallThumbnail": false,
+    "formats": [
+      "jpeg",
+      "png",
+      "webp"
+    ],
+    "unsupportedFormats": [
+      "svg"
+    ]
+  },
+  "debugger": null,
+  "refreshNote": "No official debugger or cache-refresh tool. Previews are generated when the sender types/pastes the link and cached; change the URL (e.g. add a query string) to force a new preview.",
+  "notes": [
+    "Official (WhatsApp Business Platform 'Link Previews' doc): requires og:title, og:description, og:url, og:image; the <head> must appear within the first 300KB of the HTML; image should be under 600KB, at least 300px wide, aspect ratio (w/h) of 4:1 or less.",
+    "maxBytes 614400 = 600KB per the official doc. Several secondary sources report that images above ~300KB are dropped in practice - keep og:image well under 300KB to be safe (uncertain).",
+    "Large vs small (secondary sources): images >= 300px wide show as a full-width image above title/description; ~100-300px wide show as a small thumbnail beside the text; < 100px are dropped. Crop ratio of the large image not documented (null).",
+    "Fallbacks to <title>/meta description are estimates; the doc only names the og: tags. Formats: JPEG/PNG documented widely; webp is a secondary-source claim; SVG not supported (estimate).",
+    "Title/description truncation is line-based (about 2 lines each) and not documented; null.",
+    "Verification method: official doc pages were located via web search (search-engine extracts of the official URLs listed in source); direct page fetches of the official domain were blocked from the research environment, so wording could not be re-read in full."
+  ],
+  "source": [
+    "https://developers.facebook.com/documentation/business-messaging/whatsapp/link-previews/",
+    "https://developers.facebook.com/docs/whatsapp/link-previews",
+    "https://opengraphplus.com/consumers/whatsapp/images",
+    "https://www.getlinkpeek.com/blog/whatsapp-link-preview-not-working",
+    "https://ogpreview.app/open-graph/whatsapp"
+  ],
+  "lastVerified": "2026-10-07"
+}
