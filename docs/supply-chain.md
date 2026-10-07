@@ -18,7 +18,7 @@ Same rules as the site:
   in real Chromium instead of jsdom.
 - No `@latest`, no unknown `npx`.
 - No remote code: strict extension CSP (`script-src 'self'`), everything bundled.
-- If CI is added: GitHub Actions pinned by commit SHA.
+- CI (`.github/workflows/`): GitHub Actions pinned by commit SHA, `pnpm install --frozen-lockfile`, pnpm via Corepack (no third-party setup action), releases published with the preinstalled `gh` CLI.
 
 `@types/node` is deliberately not a dependency: `pnpm typecheck` covers `src/`
 and `wxt.config.ts`; test files are transpiled (not type-checked) by Vitest and

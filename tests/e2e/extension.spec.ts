@@ -22,6 +22,8 @@ test.beforeAll(async () => {
   server = await startServer();
   ctx = await chromium.launchPersistentContext('', {
     executablePath: chromiumPath(),
+    // Playwright's headless shell cannot load extensions: use full Chromium (new headless).
+    channel: chromiumPath() ? undefined : 'chromium',
     headless: true,
     args: [`--disable-extensions-except=${EXT}`, `--load-extension=${EXT}`],
   });

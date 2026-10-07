@@ -21,7 +21,21 @@ META SEO inspector:
 
 Local only: no backend, no telemetry, no account.
 
-## Install (load unpacked)
+## Install
+
+### From a release (no build needed)
+
+1. Download `seo-shirabe-<version>-chrome.zip` from the latest
+   [GitHub release](https://github.com/Raffaelbdl/seo-shirabe/releases/latest)
+   and unzip it into a folder you keep (e.g. `~/Apps/shirabe`).
+2. Open `chrome://extensions`, turn on *Developer mode*, and drag the unzipped
+   folder onto the page (or *Load unpacked* → pick the folder).
+
+To update: unzip the new release over the same folder and click ↻ on the
+Shirabe card in `chrome://extensions`. Keeping the same folder keeps the same
+extension ID, so settings and comparison sets are preserved.
+
+### From source
 
 Requires Node 22 and **pnpm** (the version is pinned in `package.json` →
 `packageManager`). With Corepack, which ships with Node 22, you get that exact
@@ -30,7 +44,7 @@ version:
 ```sh
 corepack enable       # or, without Corepack: npm install -g pnpm@10.28.0
 pnpm install --frozen-lockfile
-pnpm build            # → .output/chrome-mv3
+pnpm build            # → .output/chrome-mv3 (load it as above)
 ```
 
 Use pnpm rather than npm. npm ignores `pnpm-lock.yaml` (transitive
@@ -38,11 +52,12 @@ dependencies would float), does not apply the 7-day `minimumReleaseAge`, runs
 dependency install scripts by default, and `test:e2e` calls pnpm. See
 [docs/supply-chain.md](docs/supply-chain.md).
 
-`chrome://extensions` → enable *Developer mode* → *Load unpacked* → pick
-`.output/chrome-mv3`. Pin the extension, then click the **Shirabe toolbar
-icon on the page you want to inspect**: the click opens the side panel and
-gives it temporary access to that tab (Chrome hides tab addresses from
-extensions otherwise). Then press *Allow <site>* once per site.
+### First use
+
+Pin the extension, then click the **Shirabe toolbar icon on the page you want
+to inspect**: the click opens the side panel and gives it temporary access to
+that tab (Chrome hides tab addresses from extensions otherwise). Then press
+*Allow <site>* once per site.
 
 The first time you audit a site, Shirabe asks for access to that origin
 (`optional_host_permissions`). *Settings (⚙) → Grant access to all sites*
@@ -82,6 +97,21 @@ Tests use the Chromium that ships with Playwright, or `/opt/pw-browsers/chromium
 or `CHROMIUM_PATH`. The e2e build (`.output/chrome-mv3-e2e`) has a blanket
 host permission so tests can run without the permission prompt; never load it
 in your own browser.
+
+## CI / releases
+
+- `.github/workflows/ci.yml` runs on every push and pull request: typecheck,
+  unit tests, build and the e2e tests in Chromium.
+- `.github/workflows/release.yml` runs on a `v*` tag: same checks, then
+  `pnpm zip` and a GitHub release with `seo-shirabe-<version>-chrome.zip`.
+  The tag must match `package.json`:
+
+  ```sh
+  npm version patch          # bumps package.json, commits, tags vX.Y.Z (no install)
+  git push --follow-tags
+  ```
+
+Actions are pinned by commit SHA.
 
 ## Layout
 
