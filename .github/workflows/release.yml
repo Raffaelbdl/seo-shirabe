@@ -1,5 +1,6 @@
-# Push a tag matching the package.json version to publish a release:
-#   npm version patch && git push --follow-tags
+# Publishes v<package.json version> as a GitHub release, either from
+# Actions → Release → "Run workflow" (creates the tag on the selected branch)
+# or by pushing the tag yourself: npm version patch && git push --follow-tags
 # The release carries seo-shirabe-<version>-chrome.zip: unzip it and drag the
 # folder onto chrome://extensions (Developer mode on).
 name: Release
@@ -7,6 +8,7 @@ name: Release
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -28,17 +30,19 @@ jobs:
           node-version: 22
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
-      - name: Check the tag matches package.json
+      - name: Resolve the tag from package.json
         run: |
-          version=$(node -p "require('./package.json').version")
-          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $version"
+          tag="v$(node -p "require('./package.json').version")"
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "$tag" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json ($tag)"
             exit 1
           fi
+          echo "TAG=$tag" >> "$GITHUB_ENV"
       - run: pnpm zip
       - name: Publish the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" .output/seo-shirabe-*-chrome.zip \
-            --title "Shirabe $GITHUB_REF_NAME" --generate-notes
+          # --target creates the tag on this commit when it does not exist yet
+          gh release create "$TAG" .output/seo-shirabe-*-chrome.zip \
+            --target "$GITHUB_SHA" --title "Shirabe $TAG" --generate-notes

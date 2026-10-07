@@ -102,9 +102,11 @@ in your own browser.
 
 - `.github/workflows/ci.yml` runs on every push and pull request: typecheck,
   unit tests, build and the e2e tests in Chromium.
-- `.github/workflows/release.yml` runs on a `v*` tag: same checks, then
-  `pnpm zip` and a GitHub release with `seo-shirabe-<version>-chrome.zip`.
-  The tag must match `package.json`:
+- `.github/workflows/release.yml` publishes `v<package.json version>` as a
+  GitHub release with `seo-shirabe-<version>-chrome.zip`, after the same checks.
+  Bump `version` in `package.json` first (releases are never overwritten), then
+  either click *Actions → Release → Run workflow* (it creates the tag), or push
+  the tag yourself:
 
   ```sh
   npm version patch          # bumps package.json, commits, tags vX.Y.Z (no install)
