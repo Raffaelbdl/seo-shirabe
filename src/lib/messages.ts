@@ -64,6 +64,17 @@ export function validateBgRequest(m: unknown): BgRequest | null {
   }
 }
 
+/** Background → side panel: the toolbar icon was clicked (activeTab now reveals the tab URL). */
+export interface ActionClicked {
+  type: 'shirabe/action-clicked';
+  windowId: number;
+}
+
+export function validateActionClicked(m: unknown): ActionClicked | null {
+  const r = m as Partial<ActionClicked> | null;
+  return r?.type === 'shirabe/action-clicked' && typeof r.windowId === 'number' ? { type: r.type, windowId: r.windowId } : null;
+}
+
 export function validateOffscreen(m: unknown): OffscreenParse | null {
   if (!m || typeof m !== 'object') return null;
   const r = m as Record<string, unknown>;

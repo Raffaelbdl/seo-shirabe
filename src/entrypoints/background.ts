@@ -3,7 +3,7 @@
 import { defineBackground } from 'wxt/utils/define-background';
 import { canonicalProbe, hreflangProbe, linksProbe, rawAudit, siteAudit, soft404Probe, type Deps } from '../lib/collect';
 import { metricsFrom, type CompareMetrics } from '../lib/compare';
-import { validateBgRequest, type BgRequest, type BgResponses, type Envelope } from '../lib/messages';
+import { validateBgRequest, type ActionClicked, type BgRequest, type BgResponses, type Envelope } from '../lib/messages';
 import { fetchCapped, mapLimit, politeGate, type FetchOptions } from '../lib/net';
 import { grantedOrigins, matchesPattern } from '../lib/permissions';
 import { audit } from '../lib/rules';
@@ -26,7 +26,7 @@ export default defineBackground(() => {
   chrome.action.onClicked.addListener((tab) => {
     // open() must run synchronously inside the user gesture
     chrome.sidePanel.open({ windowId: tab.windowId }).catch(() => undefined);
-    chrome.runtime.sendMessage({ type: 'shirabe/action-clicked', tabId: tab.id }).catch(() => undefined);
+    chrome.runtime.sendMessage({ type: 'shirabe/action-clicked', windowId: tab.windowId } satisfies ActionClicked).catch(() => undefined);
   });
 
   // ---- redirect chains of our own requests (webRequest, observe only) ------

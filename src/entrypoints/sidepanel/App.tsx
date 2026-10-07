@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { requestHostAccess } from '../../lib/permissions';
+import { validateActionClicked } from '../../lib/messages';
+import { ALL_SITES, requestHostAccess } from '../../lib/permissions';
 import { DEFAULT_SETTINGS, loadSettings, type Settings as S } from '../../lib/settings';
 import type { TabProps } from './props';
 import { showInPage } from './tab';
@@ -67,21 +68,22 @@ export function App() {
         });
     };
     const onPerm = () => void refreshTab();
-    // Toolbar icon clicked while the panel is open: activeTab now reveals the URL.
-    const onMessage = (msg: unknown, sender: chrome.runtime.MessageSender) => {
-      if (sender.id === chrome.runtime.id && (msg as { type?: string } | null)?.type === 'shirabe/action-clicked') void refreshTab();
+    // Toolbar icon clicked in this window: activeTab now reveals the tab URL.
+    const onMessage = (msg: unknown) => {
+      const m = validateActionClicked(msg);
+      if (m)
+        void chrome.windows.getCurrent().then((w) => {
+          if (w.id === m.windowId) void refreshTab();
+        });
       return false;
     };
-    const onFocus = () => void refreshTab();
     chrome.runtime.onMessage.addListener(onMessage);
-    window.addEventListener('focus', onFocus);
     chrome.tabs.onActivated.addListener(onActivated);
     chrome.tabs.onUpdated.addListener(onUpdated);
     chrome.permissions.onAdded.addListener(onPerm);
     chrome.permissions.onRemoved.addListener(onPerm);
     return () => {
       chrome.runtime.onMessage.removeListener(onMessage);
-      window.removeEventListener('focus', onFocus);
       chrome.tabs.onActivated.removeListener(onActivated);
       chrome.tabs.onUpdated.removeListener(onUpdated);
       chrome.permissions.onAdded.removeListener(onPerm);
@@ -109,6 +111,7 @@ export function App() {
   );
 
   const http = !!tab?.url && /^https?:/i.test(tab.url);
+  const pageNotices = view !== 'compare' && view !== 'settings';
   const stale = !!state.url && !!tab?.url && state.url !== tab.url;
   const host = (() => {
     try {
@@ -126,7 +129,7 @@ export function App() {
         <div className="top-url">
           <div className="top-title">{tab?.title || 'Shirabe'}</div>
           <div className="break small muted" data-testid="tab-url">
-            {tab?.url ?? (tab ? 'Address not visible yet — click the Shirabe toolbar icon on this page.' : 'Click the Shirabe icon on a page to inspect it.')}
+            {tab?.url ?? 'Click the Shirabe icon on a page to inspect it.'}
           </div>
         </div>
         <div className="top-actions">
@@ -151,23 +154,19 @@ export function App() {
         </div>
       </header>
       {stale && <p className="notice small">The tab changed since this audit ({state.url}). Re-audit to update.</p>}
-      {tab && !tab.url && view !== 'compare' && view !== 'settings' && (
+      {tab && !tab.url && pageNotices && (
         <div className="notice">
           <p>
             Shirabe cannot see this tab’s address yet. Click the <b>Shirabe icon</b> in the toolbar while on the page (this gives temporary access to the tab),
             then allow the site.
           </p>
-          <button
-            onClick={async () => {
-              if (await chrome.permissions.request({ origins: ['<all_urls>'] })) void refreshTab();
-            }}
-          >
+          <button onClick={() => void chrome.permissions.request({ origins: ALL_SITES })}>
             Or grant access to all sites
           </button>
         </div>
       )}
-      {tab?.url && !http && view !== 'compare' && view !== 'settings' && <p className="notice">Only http(s) pages can be audited.</p>}
-      {http && access === false && view !== 'compare' && view !== 'settings' && (
+      {tab?.url && !http && pageNotices && <p className="notice">Only http(s) pages can be audited.</p>}
+      {http && access === false && pageNotices && (
         <p className="notice">
           Shirabe needs access to <b>{host}</b> to fetch the raw HTML (without cookies) and read the rendered page. Nothing leaves your browser.
         </p>
