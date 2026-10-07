@@ -100,18 +100,13 @@ in your own browser.
 
 ## CI / releases
 
-- `.github/workflows/ci.yml` runs on every push and pull request: typecheck,
-  unit tests, build and the e2e tests in Chromium.
+- `.github/workflows/ci.yml` runs on pushes to `main` and on pull requests
+  targeting `main`: typecheck, unit tests, build and the e2e tests in Chromium.
 - `.github/workflows/release.yml` publishes `v<package.json version>` as a
   GitHub release with `seo-shirabe-<version>-chrome.zip`, after the same checks.
-  Bump `version` in `package.json` first (releases are never overwritten), then
-  either click *Actions → Release → Run workflow* (it creates the tag), or push
-  the tag yourself:
-
-  ```sh
-  npm version patch          # bumps package.json, commits, tags vX.Y.Z (no install)
-  git push --follow-tags
-  ```
+  Bump `version` in `package.json` (releases are never overwritten), merge to
+  `main`, then click *Actions → Release → Run workflow* on `main`; the release
+  creates the tag. Runs on any other branch are skipped.
 
 Actions are pinned by commit SHA.
 
