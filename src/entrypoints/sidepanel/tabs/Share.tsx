@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { requestHostAccess } from '../../../lib/permissions';
 import { GOOGLE_DESCRIPTION_FONT_PX, GOOGLE_TITLE_FONT_PX, truncateChars, truncateToPx } from '../../../lib/pixels';
 import { genericImageIssues, platformImageIssues } from '../../../lib/share/images';
-import { PLATFORMS, type PlatformRule } from '../../../lib/share/platforms';
+import { headTagsInBody } from '../../../lib/page';
+import { BOTS, PLATFORM_BOT, PLATFORMS, type PlatformRule } from '../../../lib/share/platforms';
 import { resolvePreview, type Resolved, type SharePreview } from '../../../lib/share/resolve';
-import type { ShareImageCheck } from '../../../lib/types';
+import type { PageData, ShareImageCheck } from '../../../lib/types';
 import type { TabProps } from '../props';
 import { ExtLink, Findings, Muted, Section, SevIcon } from '../ui';
 
@@ -12,6 +13,12 @@ function Src({ r, label }: { r: Resolved; label: string }) {
   return (
     <li>
       {label} ← {r.source ? <code>{r.source}</code> : <Muted>nothing</Muted>}
+      {r.inHead === false && (
+        <span className="warn" title="Found only in <body>: scrapers that stop at </head> miss it">
+          {' '}
+          (in &lt;body&gt;)
+        </span>
+      )}
     </li>
   );
 }
@@ -107,6 +114,8 @@ function SocialCard({ pv, check, blob }: { pv: SharePreview; check?: ShareImageC
   );
 }
 
+const botLabel = (id: string | undefined) => BOTS.find((b) => b.id === id)?.label ?? id ?? '';
+
 export function Share({ state, report, actions, onShow }: TabProps) {
   const raw = state.raw?.page;
   const [open, setOpen] = useState<string | null>(null);
@@ -116,10 +125,65 @@ export function Share({ state, report, actions, onShow }: TabProps) {
   const checkFor = (u: string | null) => (u ? state.images.find((c) => c.url === u) : undefined);
   const corsBlocked = state.images.filter((c) => c.error && /CORS|host access/i.test(c.error));
   const findings = report?.findings.filter((f) => f.category === 'share') ?? [];
+  const botIds = [...new Set(PLATFORMS.map((p) => PLATFORM_BOT[p.platform]).filter(Boolean))];
+  const fetchedBots = botIds.filter((b) => state.shareBots[b]);
+  /** HTML a platform's preview is built from: its own crawler's response when fetched, else the browser-UA response. */
+  const pageFor = (rule: PlatformRule): { page: PageData; as: string | null; error: string | null } => {
+    const r = state.shareBots[PLATFORM_BOT[rule.platform]];
+    if (!r) return { page: raw, as: null, error: null };
+    if (!r.page) return { page: raw, as: null, error: `${botLabel(PLATFORM_BOT[rule.platform])}: ${r.fetch.error ?? `HTTP ${r.fetch.status}, no HTML`}` };
+    return { page: r.page, as: botLabel(PLATFORM_BOT[rule.platform]), error: null };
+  };
+  const browserInBody = headTagsInBody(raw).filter((t) => /^meta (property|name)="(og:|twitter:)/.test(t.tag)).length;
 
   return (
     <>
-      <p className="small muted">Built from the raw HTML only — scrapers do not run JavaScript. Platform rules: src/rules/share/*.json.</p>
+      <p className="small muted">
+        Built from the raw HTML only — scrapers do not run JavaScript. Platform rules: src/rules/share/*.json. Servers can answer differently per
+        user agent (e.g. Next.js streams metadata into &lt;body&gt; for user agents it does not list as bots), so fetch with each platform&apos;s crawler
+        to see what it really gets.
+      </p>
+      <div className="row">
+        <button onClick={() => actions.fetchShareBots()} disabled={!!state.running.shareBots}>
+          {state.running.shareBots ? `Fetching as bots… (${fetchedBots.length}/${botIds.length})` : fetchedBots.length ? "Re-fetch as each platform's bot" : "Fetch as each platform's bot"}
+        </button>
+        {state.errors.shareBots && <span className="error-line small">{state.errors.shareBots}</span>}
+      </div>
+      {browserInBody > 0 && (
+        <p className="notice small">
+          With this browser&apos;s user agent, {browserInBody} og:/twitter: tag{browserInBody > 1 ? 's are' : ' is'} only in &lt;body&gt;.
+          {fetchedBots.length ? ' Cards below use each crawler\'s own response where fetched.' : " Fetch as each platform's bot to see whether crawlers get them in <head>."}
+        </p>
+      )}
+      {fetchedBots.length > 0 && (
+        <table className="small">
+          <thead>
+            <tr>
+              <th>Crawler</th>
+              <th>HTTP</th>
+              <th>og/twitter in &lt;head&gt;</th>
+              <th>only in &lt;body&gt;</th>
+            </tr>
+          </thead>
+          <tbody>
+            {fetchedBots.map((b) => {
+              const r = state.shareBots[b];
+              const p = r.page;
+              const social = p ? p.metas.filter((m) => /^(og:|twitter:)/i.test(m.property ?? m.name ?? '')) : [];
+              const inHead = social.filter((m) => m.inHead).length;
+              const inBody = social.length - inHead;
+              return (
+                <tr key={b}>
+                  <td>{botLabel(b)}</td>
+                  <td>{r.fetch.error ? <span className="bad">{r.fetch.error}</span> : r.fetch.status}</td>
+                  <td>{p ? inHead : '—'}</td>
+                  <td className={inBody ? 'warn' : undefined}>{p ? inBody : '—'}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
       {corsBlocked.length > 0 && (
         <p className="notice">
           The share image is on another host. Grant access to check it:{' '}
@@ -133,7 +197,8 @@ export function Share({ state, report, actions, onShow }: TabProps) {
         </p>
       )}
       {PLATFORMS.map((rule: PlatformRule) => {
-        const pv = resolvePreview(raw, rule);
+        const src = pageFor(rule);
+        const pv = resolvePreview(src.page, rule);
         const check = checkFor(pv.image.value);
         return (
           <Section
@@ -148,6 +213,10 @@ export function Share({ state, report, actions, onShow }: TabProps) {
               </span>
             }
           >
+            <p className="small muted">
+              HTML fetched as {src.as ?? 'this browser'}
+              {src.error && <span className="bad"> — {src.error}, showing the browser response</span>}
+            </p>
             {rule.platform === 'google' ? <GoogleCard pv={pv} url={url} /> : <SocialCard pv={pv} check={check} blob={pv.image.value ? state.blobs[pv.image.value] : undefined} />}
             {rule.refreshNote && <p className="small muted">Refresh: {rule.refreshNote}</p>}
             {open === rule.platform && (

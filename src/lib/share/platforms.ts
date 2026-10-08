@@ -51,6 +51,19 @@ export const PLATFORMS: PlatformRule[] = [x, facebook, linkedin, telegram, disco
 export const SOCIAL_PLATFORMS = PLATFORMS.filter((p) => p.platform !== 'google');
 export const BOTS: BotProfile[] = (bots as { bots: BotProfile[] }).bots;
 
+/** Crawler user agent each platform fetches with (ids from src/rules/bots.json). */
+export const PLATFORM_BOT: Record<string, string> = {
+  x: 'twitterbot',
+  facebook: 'facebookexternalhit',
+  linkedin: 'linkedinbot',
+  telegram: 'telegrambot',
+  discord: 'discordbot',
+  whatsapp: 'whatsapp',
+  slack: 'slackbot-linkexpanding',
+  imessage: 'imessage',
+  google: 'googlebot-smartphone',
+};
+
 export function platform(id: string): PlatformRule {
   const p = PLATFORMS.find((x) => x.platform === id);
   if (!p) throw new Error(`unknown platform ${id}`);

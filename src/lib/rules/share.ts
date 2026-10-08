@@ -1,4 +1,4 @@
-import { canonical, socialMeta } from '../page';
+import { canonical, headTagsInBody, socialMeta } from '../page';
 import { textWidthPx, truncateChars } from '../pixels';
 import { genericImageIssues, platformImageIssues } from '../share/images';
 import { SOCIAL_PLATFORMS } from '../share/platforms';
@@ -74,6 +74,30 @@ export const shareRules: Rule[] = [
       if (samePage(ogAbs, c) && ogAbs === c) return [];
       if (samePage(ogAbs, c)) return [{ severity: 'info', title: 'og:url and canonical differ in form', value: `og:url: ${og}\ncanonical: ${c}` }];
       return [{ severity: 'warning', title: 'og:url differs from the canonical', value: `og:url: ${og}\ncanonical: ${c}` }];
+    },
+  },
+  {
+    id: 'share.meta-in-body',
+    category: 'share',
+    view: 'raw',
+    title: 'Share tags in <head>',
+    why: 'Link-preview scrapers read <head>; many stop parsing at </head> or after the first kilobytes. Tags that end up at the bottom of <body> (e.g. Next.js 15.2+ streamed metadata for user agents it does not treat as bots) may be missed.',
+    fix: 'Emit og:* / twitter:* in <head>. Next.js: set htmlLimitedBots: /.*/ in next.config to disable streamed metadata, or check with "Fetch as each platform\'s bot" which HTML each scraper actually receives.',
+    docs: 'https://nextjs.org/docs/app/api-reference/config/next-config-js/htmlLimitedBots',
+    check: ({ raw, input }) => {
+      if (!raw) return null;
+      const tags = headTagsInBody(raw)
+        .map((t) => t.tag)
+        .filter((t) => /^meta (property|name)="(og:|twitter:)/.test(t));
+      if (!tags.length) return [];
+      const ua = input.raw?.fetch.userAgent;
+      return [
+        {
+          severity: 'warning',
+          title: `${tags.length} share tag${tags.length > 1 ? 's' : ''} only in <body>${ua ? ` (fetched as ${ua})` : ''}`,
+          value: tags.join('\n'),
+        },
+      ];
     },
   },
   {

@@ -17,15 +17,28 @@ export function metaByProperty(page: PageData, prop: string, headOnly = true): s
     .map((m) => (m.content ?? '').trim());
 }
 
-/** og:* is read from property=, twitter:* from name= — each falls back to the other attribute. */
-export function socialMeta(page: PageData, key: string): { value: string; attr: 'property' | 'name' } | null {
+export interface SocialMetaHit {
+  value: string;
+  attr: 'property' | 'name';
+  /** False when the tag was only found in <body> (e.g. Next.js streamed metadata). */
+  inHead: boolean;
+}
+
+/**
+ * og:* is read from property=, twitter:* from name= — each falls back to the other attribute.
+ * <head> wins; tags that only exist in <body> are still returned (inHead: false) so callers can
+ * show them and flag the placement instead of reporting them as missing.
+ */
+export function socialMeta(page: PageData, key: string): SocialMetaHit | null {
   const isTwitter = key.toLowerCase().startsWith('twitter:');
-  const primary = isTwitter ? metaByName(page, key) : metaByProperty(page, key);
-  const v1 = primary.find((v) => v !== '');
-  if (v1 !== undefined) return { value: v1, attr: isTwitter ? 'name' : 'property' };
-  const secondary = isTwitter ? metaByProperty(page, key) : metaByName(page, key);
-  const v2 = secondary.find((v) => v !== '');
-  if (v2 !== undefined) return { value: v2, attr: isTwitter ? 'property' : 'name' };
+  for (const headOnly of [true, false]) {
+    const primary = isTwitter ? metaByName(page, key, headOnly) : metaByProperty(page, key, headOnly);
+    const v1 = primary.find((v) => v !== '');
+    if (v1 !== undefined) return { value: v1, attr: isTwitter ? 'name' : 'property', inHead: headOnly };
+    const secondary = isTwitter ? metaByProperty(page, key, headOnly) : metaByName(page, key, headOnly);
+    const v2 = secondary.find((v) => v !== '');
+    if (v2 !== undefined) return { value: v2, attr: isTwitter ? 'property' : 'name', inHead: headOnly };
+  }
   return null;
 }
 
@@ -34,9 +47,46 @@ export function title(page: PageData): string | null {
   return t ? t.text : null;
 }
 
+/** Meta description: <head> first, then <body> (see descriptionInHead). */
 export function description(page: PageData): string | null {
   const d = metaByName(page, 'description');
-  return d.length ? d[0] : null;
+  if (d.length) return d[0];
+  const b = metaByName(page, 'description', false);
+  return b.length ? b[0] : null;
+}
+
+export function descriptionInHead(page: PageData): boolean {
+  return metaByName(page, 'description').length > 0;
+}
+
+export function titleInHead(page: PageData): boolean {
+  return page.titles.some((t) => t.inHead);
+}
+
+const HEAD_LINK_RELS = ['canonical', 'alternate', 'icon', 'shortcut', 'apple-touch-icon', 'manifest', 'image_src'];
+const INDEXING_TAGS = /^(link rel="canonical"|link rel="alternate"|meta name="(robots|googlebot)")/;
+
+/**
+ * Tags that belong in <head> but were parsed into <body>. Happens when a framework streams
+ * metadata after the first byte (Next.js 15.2+ "streaming metadata") or when an element the
+ * parser does not allow in <head> appears before them, which closes <head> early.
+ * Microdata (<meta itemprop>) is legitimately in <body> and is ignored.
+ */
+export function headTagsInBody(page: PageData): { tag: string; indexing: boolean }[] {
+  const out: string[] = [];
+  if (!page.titles.some((t) => t.inHead) && page.titles.length) out.push('title');
+  for (const m of page.metas) {
+    if (m.inHead || m.itemprop) continue;
+    if (m.name) out.push(`meta name="${m.name.toLowerCase()}"`);
+    else if (m.property) out.push(`meta property="${m.property.toLowerCase()}"`);
+    else if (m.httpEquiv) out.push(`meta http-equiv="${m.httpEquiv.toLowerCase()}"`);
+  }
+  for (const l of page.headLinks) {
+    if (l.inHead) continue;
+    const rel = l.rel.split(/\s+/).find((r) => HEAD_LINK_RELS.includes(r));
+    if (rel) out.push(`link rel="${l.rel}"${l.hreflang ? ` hreflang="${l.hreflang}"` : ''}`);
+  }
+  return [...new Set(out)].map((tag) => ({ tag, indexing: INDEXING_TAGS.test(tag) }));
 }
 
 export function linksByRel(page: PageData, rel: string, headOnly = true) {

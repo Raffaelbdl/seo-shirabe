@@ -29,6 +29,7 @@ Scoring: each category starts at 100; an error costs 20, a warning 8, info 0.
 
 | id | view | checks | fix |
 |---|---|---|---|
+| `meta.head-in-body` | raw | Head tags are in <head> ([docs](https://nextjs.org/docs/app/api-reference/functions/generate-metadata#streaming-metadata)) | Render metadata in &lt;head> of the server HTML. Next.js: set htmlLimitedBots: /.*/ in next.config (blocking metadata for every user agent); otherwise move the element that closes &lt;head> early. |
 | `meta.title` | raw | Title present and unique ([docs](https://developers.google.com/search/docs/appearance/title-link)) | Add exactly one descriptive &lt;title> in &lt;head>, specific to this page. |
 | `meta.title-length` | raw | Title length fits Google results ([docs](https://developers.google.com/search/docs/appearance/title-link)) | Put the distinctive words first and keep the title under roughly 55–60 characters. |
 | `meta.title-homepage` | site | Title differs from the homepage ([docs](https://developers.google.com/search/docs/appearance/title-link)) | Generate a page-specific title (e.g. "&lt;Anime> pilgrimage map – &lt;Site>"). |
@@ -91,6 +92,7 @@ Scoring: each category starts at 100; an error costs 20, a warning 8, info 0.
 | `share.og` | raw | Open Graph tags present ([docs](https://ogp.me/)) | Add &lt;meta property="og:…" content="…"> tags in &lt;head> of the server HTML. |
 | `share.twitter-card` | raw | twitter:card set ([docs](https://developer.x.com/en/docs/x-for-websites/cards/overview/markup)) | Add &lt;meta name="twitter:card" content="summary_large_image">. |
 | `share.og-url` | raw | og:url matches the canonical ([docs](https://ogp.me/)) | Output the same absolute URL in og:url and rel=canonical. |
+| `share.meta-in-body` | raw | Share tags in <head> ([docs](https://nextjs.org/docs/app/api-reference/config/next-config-js/htmlLimitedBots)) | Emit og:* / twitter:* in &lt;head>. Next.js: set htmlLimitedBots: /.*/ in next.config to disable streamed metadata, or check with "Fetch as each platform's bot" which HTML each scraper actually receives. |
 | `share.js-only` | rendered | Share tags in the raw HTML ([docs](https://ogp.me/)) | Render Open Graph / Twitter tags on the server (SSR or prerender for bots). |
 | `share.truncation` | raw | Share title/description fit the platforms | Keep og:title under ~60 characters and og:description under ~155 characters. |
 | `share.image` | raw | Share image loads and fits every platform ([docs](https://developers.facebook.com/docs/sharing/webmasters/images)) | Serve a 1200×630 JPEG or PNG under 600 KB, publicly reachable over https, with og:image:width/height. |

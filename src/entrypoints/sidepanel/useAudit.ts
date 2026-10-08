@@ -4,9 +4,9 @@ import { canonical } from '../../lib/page';
 import { hasHostAccess } from '../../lib/permissions';
 import { audit } from '../../lib/rules';
 import { checkShareImage } from '../../lib/share/images';
-import { SOCIAL_PLATFORMS } from '../../lib/share/platforms';
+import { PLATFORM_BOT, PLATFORMS, SOCIAL_PLATFORMS } from '../../lib/share/platforms';
 import { shareImageCandidates } from '../../lib/share/resolve';
-import type { AuditReport, Probes, RawAudit, RenderedAudit, ShareImageCheck, SiteAudit } from '../../lib/types';
+import type { AuditReport, PageData, Probes, RawAudit, RenderedAudit, ShareImageCheck, SiteAudit } from '../../lib/types';
 import { extractRendered, getVitals } from './tab';
 
 export interface TabInfo {
@@ -26,13 +26,15 @@ export interface AuditState {
   probes: Probes;
   images: ShareImageCheck[];
   blobs: Record<string, string>;
-  running: Partial<Record<Step | keyof Probes | 'bot', boolean>>;
-  errors: Partial<Record<Step | keyof Probes | 'bot', string>>;
+  running: Partial<Record<Step | keyof Probes | 'bot' | 'shareBots', boolean>>;
+  errors: Partial<Record<Step | keyof Probes | 'bot' | 'shareBots', string>>;
   bot: { botId: string; raw: RawAudit } | null;
+  /** Raw HTML fetched with each platform's crawler user agent, keyed by bot id. */
+  shareBots: Record<string, RawAudit>;
   at: number | null;
 }
 
-const EMPTY: AuditState = { url: null, tabId: null, raw: null, rendered: null, site: null, probes: {}, images: [], blobs: {}, running: {}, errors: {}, bot: null, at: null };
+const EMPTY: AuditState = { url: null, tabId: null, raw: null, rendered: null, site: null, probes: {}, images: [], blobs: {}, running: {}, errors: {}, bot: null, shareBots: {}, at: null };
 
 const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
@@ -52,9 +54,12 @@ export function useAudit() {
     blobsRef.current = [];
   };
 
-  const checkImages = useCallback(async (id: number, raw: RawAudit) => {
+  const checkImages = useCallback(async (id: number, raw: RawAudit, extra: PageData[] = [], skip: string[] = []) => {
     if (!raw.page) return;
-    const candidates = shareImageCandidates(raw.page, SOCIAL_PLATFORMS);
+    const seen = new Set(skip);
+    const candidates = [raw.page, ...extra]
+      .flatMap((p) => shareImageCandidates(p, SOCIAL_PLATFORMS))
+      .filter((c) => (seen.has(c.url) ? false : (seen.add(c.url), true)));
     if (!candidates.length) return;
     setRunning(id, 'images', true);
     const checks: ShareImageCheck[] = [];
@@ -70,7 +75,7 @@ export function useAudit() {
       }
       checks.push(check);
     }
-    patch(id, (s) => ({ images: checks, blobs: { ...s.blobs, ...blobs }, running: { ...s.running, images: false } }));
+    patch(id, (s) => ({ images: skip.length ? [...s.images, ...checks] : checks, blobs: { ...s.blobs, ...blobs }, running: { ...s.running, images: false } }));
   }, [patch]);
 
   const run = useCallback(
@@ -171,6 +176,29 @@ export function useAudit() {
     [state.url, patch],
   );
 
+  const fetchShareBots = useCallback(async () => {
+    const id = runId.current;
+    if (!state.url) return;
+    const url = state.raw && !state.raw.fetch.error ? state.raw.fetch.finalUrl : state.url;
+    const botIds = [...new Set(PLATFORMS.map((p) => PLATFORM_BOT[p.platform]).filter(Boolean))];
+    setRunning(id, 'shareBots', true, '');
+    const results: Record<string, RawAudit> = {};
+    try {
+      // Sequential on purpose: the background serialises User-Agent overrides.
+      for (const botId of botIds) {
+        results[botId] = await callBg({ type: 'raw', url, botId });
+        patch(id, (s) => ({ shareBots: { ...s.shareBots, [botId]: results[botId] } }));
+      }
+      setRunning(id, 'shareBots', false);
+      if (state.raw) {
+        const pages = Object.values(results).flatMap((r) => (r.page ? [r.page] : []));
+        await checkImages(id, state.raw, pages, state.images.map((c) => c.url));
+      }
+    } catch (e) {
+      setRunning(id, 'shareBots', false, errMsg(e));
+    }
+  }, [state.url, state.raw, state.images, patch, checkImages]);
+
   const recheckImage = useCallback(async () => {
     if (state.raw) await checkImages(runId.current, state.raw);
   }, [state.raw, checkImages]);
@@ -188,7 +216,7 @@ export function useAudit() {
     setState(EMPTY);
   }, []);
 
-  return { state, report, run, probe, fetchAsBot, refreshVitals, recheckImage, reset };
+  return { state, report, run, probe, fetchAsBot, fetchShareBots, refreshVitals, recheckImage, reset };
 }
 
 export async function canAudit(url: string | null): Promise<boolean> {

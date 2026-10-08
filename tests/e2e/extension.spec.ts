@@ -152,3 +152,23 @@ test('compare tab: run a set and export', async () => {
   await panel.close();
   await site.close();
 });
+
+test('share: metadata streamed into <body> is shown and per-crawler HTML is compared', async () => {
+  const { panel, site } = await openPanelFor('/streamed');
+  await expect(panel.getByTestId('verdict')).toBeVisible({ timeout: 30_000 });
+  await panel.getByRole('tab', { name: 'Share' }).click();
+  // browser UA: tags found in <body>, still used for the preview
+  await expect(panel.locator('.card-x').getByText('no image')).toHaveCount(0);
+  await expect(panel.getByText('(in <body>)').first()).toBeVisible();
+  await expect(panel.getByText(/og:\/twitter: tags are only in <body>/)).toBeVisible();
+  // per-crawler fetch: X's crawler gets them in <head>
+  await panel.getByRole('button', { name: "Fetch as each platform's bot" }).click();
+  await expect(panel.getByText('HTML fetched as Twitterbot (X)')).toBeVisible({ timeout: 30_000 });
+  const twitterRow = panel.locator('tr', { hasText: 'Twitterbot (X)' });
+  await expect(twitterRow.locator('td').nth(3)).toHaveText('0');
+  const googleRow = panel.locator('tr', { hasText: 'Googlebot smartphone' });
+  await expect(googleRow.locator('td').nth(3)).not.toHaveText('0');
+  expect(server.userAgents.some((u) => u.path === '/streamed' && u.ua === 'Twitterbot/1.0')).toBe(true);
+  await panel.close();
+  await site.close();
+});

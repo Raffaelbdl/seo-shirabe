@@ -87,7 +87,7 @@ granted origins, at page load: after granting a site, reload the tab once.
 |---|---|
 | Overview | Indexability verdict + reasons, score per category (click to filter), top issues, all findings, *Copy report* (Markdown) |
 | Meta | title / description with pixel-width estimates, canonical, robots meta + X-Robots-Tag, hreflang table, viewport, lang, charset, icons, theme-color (raw vs rendered when they differ) |
-| Share | Preview card per platform with the tag each value came from, image checks, crop simulation, debugger links |
+| Share | Preview card per platform with the tag each value came from (flagged when it was only found in `<body>`), "Fetch as each platform's bot" to build each card from what that crawler receives, image checks, crop simulation, debugger links |
 | Content | Headings outline, words raw vs rendered, links (internal/external/nofollow/not crawlable), clickable elements that are not links, images |
 | Schema | JSON-LD (pretty-printed), microdata/RDFa, page-type guess, Rich Results Test / Schema.org validator links |
 | Tech | Status, redirect chain, headers, weight breakdown (framework payloads, inline CSS, @font-face), Web Vitals, robots.txt / sitemap / llms.txt, fetch as bot, probes |

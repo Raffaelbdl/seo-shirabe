@@ -86,6 +86,21 @@ export async function startServer(publicOrigin?: string): Promise<FixtureServer>
       res.writeHead(302, { location: ANIME });
       return res.end();
     }
+    if (path === '/streamed') {
+      // Next.js 15.2+ streaming metadata: browsers get the tags at the end of <body>,
+      // user agents listed in htmlLimitedBots (social crawlers) get them in <head>.
+      const ua = req.headers['user-agent'] ?? '';
+      const streamed = local(fixture('nextjs-streamed-metadata.html')).replaceAll('/opengraph-image', '/og-streamed.png');
+      if (!/Twitterbot|facebookexternalhit|Discordbot|Slackbot|LinkedInBot|WhatsApp/i.test(ua)) return html(streamed);
+      const start = streamed.indexOf('<title>');
+      const end = streamed.indexOf('<span itemscope');
+      const tags = streamed.slice(start, end);
+      return html(streamed.replace(tags, '').replace('</head>', `${tags}</head>`));
+    }
+    if (path.endsWith('/og-streamed.png')) {
+      res.writeHead(200, { 'content-type': 'image/png' });
+      return res.end(og);
+    }
     if (path === '/' || path === '/fr') return html(local(fixture('myanimetrip-home.html')));
     if (path === ANIME || path === '/fr/map/16bit%20Sensation%3A%20Another%20Layer') return html(local(fixture('myanimetrip-anime.html')));
     if (path === '/fr/map') return html(local(fixture('myanimetrip-map.html')));

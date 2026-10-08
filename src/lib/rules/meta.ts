@@ -1,4 +1,4 @@
-import { description, favicons, hreflangs, metaByName, title } from '../page';
+import { description, favicons, headTagsInBody, hreflangs, metaByName, title } from '../page';
 import { GOOGLE_DESCRIPTION_FONT_PX, GOOGLE_TITLE_FONT_PX, textWidthPx } from '../pixels';
 import { platform } from '../share/platforms';
 import { isHomeLike, samePage } from '../url';
@@ -20,6 +20,29 @@ const norm = (s: string | null | undefined) => (s ?? '').replace(/\s+/g, ' ').tr
 
 export const metaRules: Rule[] = [
   {
+    id: 'meta.head-in-body',
+    category: 'meta',
+    view: 'raw',
+    title: 'Head tags are in <head>',
+    why: 'In the raw HTML, title, meta and link tags that end up in <body> are invisible to anything that does not run JavaScript, and Google ignores rel=canonical and hreflang outside <head>. Typical cause: Next.js 15.2+ streams metadata into <body> for user agents it does not list as bots, or an element not allowed in <head> closes it early.',
+    fix: 'Render metadata in <head> of the server HTML. Next.js: set htmlLimitedBots: /.*/ in next.config (blocking metadata for every user agent); otherwise move the element that closes <head> early.',
+    docs: 'https://nextjs.org/docs/app/api-reference/functions/generate-metadata#streaming-metadata',
+    check: ({ raw, input }) => {
+      if (!raw) return null;
+      const tags = headTagsInBody(raw);
+      if (!tags.length) return [];
+      const indexing = tags.filter((t) => t.indexing).map((t) => t.tag);
+      const other = tags.filter((t) => !t.indexing).map((t) => t.tag);
+      const ua = input.raw?.fetch.userAgent;
+      const suffix = ua ? ` (fetched as ${ua})` : '';
+      const hits = [];
+      if (indexing.length)
+        hits.push({ severity: 'error' as const, title: `Canonical / hreflang / robots in <body>${suffix}`, value: indexing.join('\n'), why: 'Google only honours rel=canonical and hreflang in <head>; a robots meta in <body> is only seen after rendering.' });
+      if (other.length) hits.push({ severity: 'warning' as const, title: `${other.length} head tag${other.length > 1 ? 's' : ''} in <body>${suffix}`, value: other.join('\n') });
+      return hits;
+    },
+  },
+  {
     id: 'meta.title',
     category: 'meta',
     view: 'raw',
@@ -31,6 +54,8 @@ export const metaRules: Rule[] = [
       const p = pick('raw');
       if (!p) return null;
       const inHead = p.page.titles.filter((t) => t.inHead);
+      // A title that only exists in <body> is reported by meta.head-in-body.
+      if (!inHead.length && p.page.titles.some((t) => t.text)) return [];
       if (!inHead.length || !inHead[0].text) return [{ severity: 'error', title: 'Title missing or empty', view: p.view }];
       if (inHead.length > 1)
         return [{ severity: 'warning', title: `${inHead.length} <title> elements`, value: inHead.map((t) => t.text).join('\n'), fix: 'Keep one <title>; browsers and crawlers use the first.', view: p.view }];
